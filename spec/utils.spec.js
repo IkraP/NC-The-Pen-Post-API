@@ -9,21 +9,39 @@ describe("formatDates", () => {
   it("return an empty array when passed an empty array", () => {
     expect(formatDates([])).to.eql([]);
   });
-  it("returns a formatted date when input array has one timestamp value", () => {
+  it("returns a formatted date when input array has one created_at timestamp value with no other key value pairs", () => {
     // A timestamp value
-    const input = [1468087638932];
-    expect(formatDates(input)[0]).to.be.an.instanceof(Date);
-  });
-  it("returns a formatted date when the input array has multiple timestamp values", () => {
-    const input = [1468087638932, 1478813209256];
+    const input = [{ created_at: 1468087638932 }];
     const output = formatDates(input);
-    expect(output[1]).to.be.an.instanceof(Date);
+    expect(output[0].created_at).to.be.an.instanceof(Date);
+  });
+  it("returns a formatted date when the input array has multiple created_at timestamp values with no other keyvalue pairs", () => {
+    const input = [
+      { created_at: 1468087638932 },
+      { created_at: 1478813209256 }
+    ];
+    const output = formatDates(input);
+    expect(output[0].created_at).to.be.an.instanceof(Date);
+  });
+  it("returns a formatted date when the input array has multiple created_at timestamps key value pairs", () => {
+    const input = [
+      { created_at: 1468087638932, name: "Ikra" },
+      { created_at: 1478813209256, name: "Sadiyah" }
+    ];
+    const output = formatDates(input);
+    expect(output[1].created_at).to.be.an.instanceof(Date);
   });
   it("does not mutate the input array", () => {
-    const input = [1468087638932, 1478813209256];
-    const inputCopy = [1468087638932, 1478813209256];
+    const input = [
+      { created_at: 1468087638932, name: "Ikra" },
+      { created_at: 1478813209256, name: "Sadiyah" }
+    ];
+    const input2 = [
+      { created_at: 1468087638932, name: "Ikra" },
+      { created_at: 1478813209256, name: "Sadiyah" }
+    ];
     formatDates(input);
-    expect(input).to.eql(inputCopy);
+    expect(input).to.eql(input2);
   });
 });
 

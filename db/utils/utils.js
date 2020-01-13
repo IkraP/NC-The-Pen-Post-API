@@ -1,8 +1,7 @@
 exports.formatDates = list => {
   if (list.length === 0) return list;
-  const newArr = [...list];
-  return newArr.map(item => {
-    return new Date(item * 1000);
+  return list.map(item => {
+    return { ...item, created_at: new Date(item.created_at * 1000) };
   });
 };
 
