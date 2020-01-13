@@ -1,5 +1,5 @@
 exports.formatDates = list => {
-  return [];
+  return new Date(list);
 };
 
 exports.makeRefObj = list => {};

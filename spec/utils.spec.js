@@ -9,6 +9,24 @@ describe("formatDates", () => {
   it("return an empty array when passed an empty array", () => {
     expect(formatDates([])).to.eql([]);
   });
+  it("returns a single date array when input array has one timestamp value", () => {
+    // A timestamp value
+    const input = 1549312452;
+    const d = new Date(input);
+    timeStampCon =
+      d.getDate() +
+      "/" +
+      d.getMonth() +
+      "/" +
+      d.getFullYear() +
+      " " +
+      d.getHours() +
+      ":" +
+      d.getMinutes();
+
+    // .getTime();
+    console.log(timeStampCon);
+  });
 });
 
 describe("makeRefObj", () => {});
