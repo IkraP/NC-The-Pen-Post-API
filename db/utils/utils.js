@@ -1,5 +1,5 @@
 exports.formatDates = list => {
-  return new Date(list);
+  return new Date(list[0] * 1000);
 };
 
 exports.makeRefObj = list => {};

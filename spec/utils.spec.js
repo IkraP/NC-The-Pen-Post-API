@@ -11,21 +11,24 @@ describe("formatDates", () => {
   });
   it("returns a single date array when input array has one timestamp value", () => {
     // A timestamp value
-    const input = 1549312452;
-    const d = new Date(input);
-    timeStampCon =
-      d.getDate() +
-      "/" +
-      d.getMonth() +
-      "/" +
-      d.getFullYear() +
-      " " +
-      d.getHours() +
-      ":" +
-      d.getMinutes();
+    const input = [1549312452];
+    expect(formatDates(input[0])).to.be.an.instanceof(Date);
 
-    // .getTime();
-    console.log(timeStampCon);
+    // const input = 1549312452;
+    // const d = new Date(input * 1000);
+    // timeStampCon =
+    //   d.getDate() +
+    //   "/" +
+    //   d.getMonth() +
+    //   "/" +
+    //   d.getFullYear() +
+    //   " " +
+    //   d.getHours() +
+    //   ":" +
+    //   d.getMinutes();
+    // // .getTime();
+    // console.log(timeStampCon);
+    // console.log(d instanceof Date);
   });
 });
 
