@@ -51,7 +51,7 @@ describe("makeRefObj", () => {
   });
   it("returns an object with key value pair of reference required when input array has one object", () => {
     const input = [{ article_id: 1, title: "A" }];
-    expect(makeRefObj(input, "title", "article_id")).to.eql({ A: 1 });
+    expect(makeRefObj(input)).to.eql({ A: 1 });
   });
   it("returns an object with key value pair of reference required when input array has multiple objects", () => {
     const input = [
@@ -59,7 +59,7 @@ describe("makeRefObj", () => {
       { article_id: 2, title: "ABC" },
       { article_id: 3, title: "ABCD" }
     ];
-    expect(makeRefObj(input, "title", "article_id")).to.eql({
+    expect(makeRefObj(input)).to.eql({
       A: 1,
       ABC: 2,
       ABCD: 3

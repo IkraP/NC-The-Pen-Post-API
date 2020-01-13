@@ -5,11 +5,11 @@ exports.formatDates = list => {
   });
 };
 
-exports.makeRefObj = (arrayOfObj, keyRequired, valueRequired) => {
+exports.makeRefObj = arrayOfObj => {
   return arrayOfObj.reduce(
     (curr, objItem) => ({
       ...curr,
-      [objItem[keyRequired]]: objItem[valueRequired]
+      [objItem.title]: objItem.article_id
     }),
     {}
   );
