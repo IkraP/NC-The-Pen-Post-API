@@ -8,8 +8,8 @@ exports.up = function(knex) {
     articleTable.integer("votes").defaultTo(0);
     articleTable
       .string("topic")
-      .references("Topics.slug")
-      .notNullable();
+      .unsigned()
+      .references("Topics.slug");
     articleTable
       .string("author")
       .references("Users.username")
