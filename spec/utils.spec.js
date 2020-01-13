@@ -53,11 +53,11 @@ describe("makeRefObj", () => {
     const input = [{ article_id: 1, title: "A" }];
     expect(makeRefObj(input)).to.eql({ A: 1 });
   });
-  it("returns an object with key value pair of reference required when input array has multiple objects", () => {
+  it("returns an object with key value pair of reference required when input array has multiple objects and other key value pairs", () => {
     const input = [
-      { article_id: 1, title: "A" },
-      { article_id: 2, title: "ABC" },
-      { article_id: 3, title: "ABCD" }
+      { article_id: 1, title: "A", name: "ikra" },
+      { article_id: 2, title: "ABC", name: "ikra" },
+      { article_id: 3, title: "ABCD", name: "ikra" }
     ];
     expect(makeRefObj(input)).to.eql({
       A: 1,
@@ -81,4 +81,127 @@ describe("makeRefObj", () => {
   });
 });
 
-describe("formatComments", () => {});
+describe.only("formatComments", () => {
+  it("returns an empty array when input array is empty", () => {
+    expect(formatComments([])).to.eql([]);
+  });
+  it("returns object with all conditions met for input array with one object", () => {
+    const refObject = makeRefObj([
+      {
+        article_id: 1,
+        title: "Js the easy way",
+        topic: "Js",
+        author: "Ikra P",
+        body: "This is a great Js helpful ebook",
+        created_at: 1468087638932,
+        votes: 1000
+      }
+    ]);
+    const commentArray = [
+      {
+        body: "You will love Js after reading this book",
+        belongs_to: "Js the easy way",
+        created_by: "Ikra P",
+        votes: 7,
+        created_at: 1478813209256
+      }
+    ];
+    expect(formatComments(commentArray, refObject)).to.eql([
+      {
+        body: "You will love Js after reading this book",
+        article_id: 1,
+        author: "Ikra P",
+        votes: 7,
+        created_at: new Date(1478813209256)
+      }
+    ]);
+  });
+  it("returns object with all conditions met for input array with multiple objects", () => {
+    const refObject = makeRefObj([
+      {
+        article_id: 1,
+        title: "Js the easy way",
+        topic: "Js",
+        author: "Ikra P",
+        body: "This is a great Js helpful ebook",
+        created_at: 1468087638932,
+        votes: 1000
+      },
+      {
+        article_id: 2,
+        title: "Nobis consequatur animi",
+        topic: "Nobis",
+        author: "grumpy19",
+        body: "Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.",
+        votes: 700,
+        created_at: 1478813209256
+      }
+    ]);
+
+    const comments = [
+      {
+        body: "this is a good book",
+        belongs_to: "Js the easy way",
+        created_by: "Ikra P",
+        votes: 0,
+        created_at: 1468087638932
+      },
+      {
+        body: "Not a good book",
+        belongs_to: "Nobis consequatur animi",
+        created_by: "grumpy19",
+        votes: 70,
+        created_at: 1478813209256
+      }
+    ];
+    expect(formatComments(comments, refObject)).to.eql([
+      {
+        body: "this is a good book",
+        article_id: 1,
+        author: "Ikra P",
+        votes: 0,
+        created_at: new Date(1468087638932)
+      },
+      {
+        body: "Not a good book",
+        article_id: 2,
+        author: "grumpy19",
+        votes: 70,
+        created_at: new Date(1478813209256)
+      }
+    ]);
+  });
+  it("does not mutate the input array", () => {
+    const refObject = makeRefObj([
+      {
+        article_id: 1,
+        title: "Js the easy way",
+        topic: "Js",
+        author: "Ikra P",
+        body: "This is a great Js helpful ebook",
+        created_at: 1468087638932,
+        votes: 1000
+      }
+    ]);
+    const commentArray = [
+      {
+        body: "You will love Js after reading this book",
+        belongs_to: "Js the easy way",
+        created_by: "Ikra P",
+        votes: 7,
+        created_at: 1478813209256
+      }
+    ];
+    const commentArray2 = [
+      {
+        body: "You will love Js after reading this book",
+        belongs_to: "Js the easy way",
+        created_by: "Ikra P",
+        votes: 7,
+        created_at: 1478813209256
+      }
+    ];
+    formatComments(commentArray, refObject);
+    expect(commentArray).to.eql(commentArray2);
+  });
+});

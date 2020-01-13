@@ -15,13 +15,15 @@ exports.makeRefObj = arrayOfObj => {
   );
 };
 
-exports.formatComments = (comments, articleRef) => {};
-// This utility function should be able to take an array of comment objects (comments) and a reference object, and return a new array of formatted comments.
+exports.formatComments = (comments, articleRef) => {
+  return comments.map(comment => {
+    let newObj = { ...comment };
+    newObj.author = comment.created_by;
+    delete newObj.created_by;
+    newObj.article_id = articleRef[comment.belongs_to];
+    delete newObj.belongs_to;
+    newObj.created_at = new Date(comment.created_at);
 
-// Each formatted comment must have:
-
-// Its created_by property renamed to an author key
-// Its belongs_to property renamed to an article_id key
-// The value of the new article_id key must be the id corresponding to the original title value provided
-// Its created_at value converted into a javascript date object
-// The rest of the comment's properties must be maintained
+    return newObj;
+  });
+};
