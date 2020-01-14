@@ -47,15 +47,15 @@ describe("/api", () => {
   });
   describe("/users", () => {
     describe("/:username", () => {
-      it.only("GET / with a status code 200 after successful response", () => {
+      it("GET / with a status code 200 after successful response", () => {
         return request(app)
           .get("/api/users/icellusedkars")
           .expect(200);
       });
-      it.only("GET / will respond with a user object", () => {
+      it("GET / will respond with a user object", () => {
         return request(app)
           .get("/api/users/icellusedkars")
-          .then(user => {
+          .then(({ body: { users } }) => {
             expect(user).to.be.an("object");
             expect(user).to.have.keys(["username", "avatar_url", "name"]);
             expect(user.name).to.equal("sam");
@@ -84,7 +84,7 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
-    describe("/:article_id", () => {
+    describe.only("/:article_id", () => {
       it("GET / will respond with a status code of 200", () => {
         return request(app)
           .get("/api/articles/1")
