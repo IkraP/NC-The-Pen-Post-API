@@ -25,8 +25,33 @@ describe("/api", () => {
         });
     });
     it("GET / will respond with 400 Invalid request when the url is invalid", () => {
-      return request(app).get("/api/not-a-valid-url");
-      // 404 Not found
+      return request(app)
+        .get("/api/not-a-valid-url")
+        .expect(404)
+        .then(topics_response => {
+          expect(topics_response.body.msg).to.equal({ msg: "Route not found" });
+        });
+    });
+  });
+  describe("/users", () => {
+    describe("/:username", () => {
+      it("GET / with a status code 200 after successful response", () => {
+        return request(app)
+          .get("/api/users/1")
+          .expect(200);
+      });
+      it("GET / will respond with a user array", () => {
+        return request(app)
+          .get("/api/users/1")
+          .then(users_response => {
+            expect(user_response.body.users).to.be.an("object");
+            expect(user_response.body.users).to.have.keys([
+              "username",
+              "avatar_url",
+              "name"
+            ]);
+          });
+      });
     });
   });
 });
