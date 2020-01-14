@@ -81,23 +81,12 @@ describe("makeRefObj", () => {
   });
 });
 
-describe.only("formatComments", () => {
+describe("formatComments", () => {
   it("returns an empty array when input array is empty", () => {
     expect(formatComments([])).to.eql([]);
   });
   it("returns object with all conditions met for input array with one object", () => {
-    const refObject = makeRefObj([
-      {
-        article_id: 1,
-        title: "Js the easy way",
-        topic: "Js",
-        author: "Ikra P",
-        body: "This is a great Js helpful ebook",
-        created_at: 1468087638932,
-        votes: 1000
-      }
-    ]);
-    console.log(refObject);
+    const refObject = { "Js the easy way": 1 };
     const commentArray = [
       {
         body: "You will love Js after reading this book",
@@ -118,26 +107,7 @@ describe.only("formatComments", () => {
     ]);
   });
   it("returns object with all conditions met for input array with multiple objects", () => {
-    const refObject = makeRefObj([
-      {
-        article_id: 1,
-        title: "Js the easy way",
-        topic: "Js",
-        author: "Ikra P",
-        body: "This is a great Js helpful ebook",
-        created_at: 1468087638932,
-        votes: 1000
-      },
-      {
-        article_id: 2,
-        title: "Nobis consequatur animi",
-        topic: "Nobis",
-        author: "grumpy19",
-        body: "Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.",
-        votes: 700,
-        created_at: 1478813209256
-      }
-    ]);
+    const refObject = { "Js the easy way": 1, "Nobis consequatur animi": 2 };
 
     const comments = [
       {
@@ -173,17 +143,8 @@ describe.only("formatComments", () => {
     ]);
   });
   it("does not mutate the input array", () => {
-    const refObject = makeRefObj([
-      {
-        article_id: 1,
-        title: "Js the easy way",
-        topic: "Js",
-        author: "Ikra P",
-        body: "This is a great Js helpful ebook",
-        created_at: 1468087638932,
-        votes: 1000
-      }
-    ]);
+    const refObject = { "Js the easy way": 1 };
+
     const commentArray = [
       {
         body: "You will love Js after reading this book",

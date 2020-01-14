@@ -1,7 +1,7 @@
 exports.formatDates = list => {
   if (list.length === 0) return list;
   return list.map(item => {
-    return { ...item, created_at: new Date(item.created_at * 1000) };
+    return { ...item, created_at: new Date(item.created_at) };
   });
 };
 

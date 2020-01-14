@@ -6,4 +6,8 @@ const apiRouter = require("./routers /apiRouter");
 app.use("/api", apiRouter);
 // error handling ;
 
+app.use((err, request, response, next) => {
+  console.log(err, "error handling");
+});
+
 module.exports = app;
