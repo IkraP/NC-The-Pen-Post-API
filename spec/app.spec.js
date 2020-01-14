@@ -69,17 +69,26 @@ describe("/api", () => {
             expect(user_response.body.msg).to.equal("Invalid username");
           });
       });
-      it.only("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
+      it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
         const invalidMethods = ["patch", "put", "delete"];
         const methodPromises = invalidMethods.map(method => {
           return request(app)
-            [method]("/api/users")
+            [method]("/api/users/icellusedkars")
             .expect(405)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("method not allowed");
             });
         });
         return Promise.all(methodPromises);
+      });
+    });
+  });
+  describe("/articles", () => {
+    describe("/:article_id", () => {
+      it.only("GET / will respond with a status code of 200", () => {
+        return request(app)
+          .get("/api/articles/1")
+          .expect(200);
       });
     });
   });
