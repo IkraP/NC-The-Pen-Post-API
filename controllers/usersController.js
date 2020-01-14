@@ -1,7 +1,9 @@
-const { selectUserById } = require("../models/usersModel");
+const { selectUsernameById } = require("../models/usersModel");
 
-const sendUserById = (request, response, next) => {
-  const { user_id } = request.params;
-  selectUserById(user_id);
+const sendUsernameById = (request, response, next) => {
+  console.log(" I am in the controller");
+  const { username } = request.params;
+  console.log(username);
+  selectUserById(username);
 };
-module.exports = { sendUserById };
+module.exports = { sendUsernameById };

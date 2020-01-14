@@ -11,7 +11,7 @@ app.all("/*", send404Error);
 
 app.use((err, request, response, next) => {
   console.log(err, "error handling");
-  response.send(err);
+  response.status(err.status).send({ msg: err.msg });
 });
 
 module.exports = app;

@@ -14,20 +14,20 @@ exports.seed = function(knex) {
     .then(() => {
       const topicsInsertions = knex("topics").insert(topicData);
       const usersInsertions = knex("users").insert(userData);
-      return Promise.all([topicsInsertions, usersInsertions])
-        .then(() => {
-          // formatting the dates in the articlesData
-          const formatArticleDates = formatDates(articleData);
-          return knex("articles")
-            .insert(formatArticleDates)
-            .returning("*");
-        })
-        .then(articleRows => {
-          const articleRef = makeRefObj(articleRows);
-          const formattedComments = formatComments(commentData, articleRef);
-          return knex("comments")
-            .insert(formattedComments)
-            .returning("*");
-        });
+      return Promise.all([topicsInsertions, usersInsertions]);
+    })
+    .then(() => {
+      // formatting the dates in the articlesData
+      const formatArticleDates = formatDates(articleData);
+      return knex("articles")
+        .insert(formatArticleDates)
+        .returning("*");
+    })
+    .then(articleRows => {
+      const articleRef = makeRefObj(articleRows);
+      const formattedComments = formatComments(commentData, articleRef);
+      return knex("comments")
+        .insert(formattedComments)
+        .returning("*");
     });
 };
