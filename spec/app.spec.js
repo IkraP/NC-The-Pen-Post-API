@@ -47,15 +47,15 @@ describe("/api", () => {
   });
   describe("/users", () => {
     describe("/:username", () => {
-      it("GET / with a status code 200 after successful response", () => {
-        return request(app)
-          .get("/api/users/1")
-          .expect(200);
-      });
-      it("GET / will respond with a user object", () => {
+      it.only("GET / with a status code 200 after successful response", () => {
         return request(app)
           .get("/api/users/icellusedkars")
-          .then(({ body: { user } }) => {
+          .expect(200);
+      });
+      it.only("GET / will respond with a user object", () => {
+        return request(app)
+          .get("/api/users/icellusedkars")
+          .then(user => {
             expect(user).to.be.an("object");
             expect(user).to.have.keys(["username", "avatar_url", "name"]);
             expect(user.name).to.equal("sam");
@@ -85,10 +85,30 @@ describe("/api", () => {
   });
   describe("/articles", () => {
     describe("/:article_id", () => {
-      it.only("GET / will respond with a status code of 200", () => {
+      it("GET / will respond with a status code of 200", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200);
+      });
+      it("GET / will respond with an article object with required keys", () => {
+        return request(app)
+          .get("/api/articles/1")
+          .then(article_response => {
+            expect(article_response.body.article).to.be.an("object");
+            expect(article_response.body.article).to.have.keys([
+              "author",
+              "title",
+              "article_id",
+              "body",
+              "topic",
+              "created_at",
+              "votes",
+              "comment_count"
+            ]);
+            expect(article_response.body.article.author).to.equal(
+              "butter_bridge"
+            );
+          });
       });
     });
   });

@@ -10,7 +10,7 @@ const selectUsername = username => {
           status: 404,
           msg: "Invalid username"
         });
-      }
+      } else return username;
     });
 };
 
