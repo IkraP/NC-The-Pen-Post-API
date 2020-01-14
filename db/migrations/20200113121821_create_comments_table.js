@@ -5,7 +5,7 @@ exports.up = function(knex) {
     commentTable
       .string("author")
       .references("users.username")
-      .onDelete("CASCADE");
+      .onDelete("SET NULL");
     commentTable
       .integer("article_id")
       .references("articles.article_id")
