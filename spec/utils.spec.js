@@ -97,6 +97,7 @@ describe.only("formatComments", () => {
         votes: 1000
       }
     ]);
+    console.log(refObject);
     const commentArray = [
       {
         body: "You will love Js after reading this book",
