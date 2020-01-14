@@ -61,13 +61,25 @@ describe("/api", () => {
             expect(user.name).to.equal("sam");
           });
       });
-      it.only("GET / will respond with invalid username when invalid user is requested", () => {
+      it("GET / will respond with invalid username when invalid user is requested", () => {
         return request(app)
-          .get("/api/sadiyahKal")
+          .get("/api/users/sadiyahKal")
           .expect(404)
           .then(user_response => {
             expect(user_response.body.msg).to.equal("Invalid username");
           });
+      });
+      it.only("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
+        const invalidMethods = ["patch", "put", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/users")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
       });
     });
   });
