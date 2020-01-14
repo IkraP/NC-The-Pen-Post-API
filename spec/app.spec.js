@@ -32,7 +32,7 @@ describe("/api", () => {
           expect(topics_response.body.msg).to.equal("Route not found");
         });
     });
-    it.only("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
+    it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
       const invalidMethods = ["patch", "put", "delete"];
       const methodPromises = invalidMethods.map(method => {
         return request(app)
@@ -52,23 +52,23 @@ describe("/api", () => {
           .get("/api/users/1")
           .expect(200);
       });
-      it("GET / will respond with a user array", () => {
+      it("GET / will respond with a user object", () => {
         return request(app)
           .get("/api/users/icellusedkars")
-          .then(users_response => {
-            expect(user_response.body.users).to.be.an("object");
-            expect(user_response.body.users).to.have.keys([
-              "username",
-              "avatar_url",
-              "name"
-            ]);
+          .then(({ body: { user } }) => {
+            expect(user).to.be.an("object");
+            expect(user).to.have.keys(["username", "avatar_url", "name"]);
+            expect(user.name).to.equal("sam");
+          });
+      });
+      it.only("GET / will respond with invalid username when invalid user is requested", () => {
+        return request(app)
+          .get("/api/sadiyahKal")
+          .expect(404)
+          .then(user_response => {
+            expect(user_response.body.msg).to.equal("Invalid username");
           });
       });
     });
   });
 });
-
-//  username: 'icellusedkars',
-//     name: 'sam',
-//     avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
-// invalid methods 405
