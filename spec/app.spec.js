@@ -128,14 +128,48 @@ describe("/api", () => {
       it("PATCH / will respond with a 200 when article has been updated with votes", () => {
         return request(app)
           .patch("/api/articles/2")
+          .send({ inc_votes: 10 })
           .expect(200);
       });
-      it("PATCH / ");
-      it("PATCH / will respond 400 Bad request", () => {
+      it("PATCH / will respond with with the updated article with votes updated", () => {
         return request(app)
-          .patch("/api/articles/1")
-          .expect(400);
+          .patch("/api/articles/2")
+          .send({ inc_votes: 10 })
+          .then(({ body: { article } }) => {
+            expect(article).to.be.an("object");
+            expect(article.votes).to.equal(10);
+            expect(article).to.contain.keys(["article_id", "body", "votes"]);
+          });
       });
+      it("PATCH / will respond with a 400 when request body does not contain inc_vote specifically and characters that do not match the required value", () => {
+        return request(app)
+          .patch("/api/articles/4")
+          .send({ inc_votes: "ikra" })
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request");
+          });
+      });
+      it("PATCH / will respond with a 400 when request body contain a spelling mistake but the correct key value pair of a number specified", () => {
+        return request(app)
+          .patch("/api/articles/3")
+          .send({ incvotes: 67 })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Missing required field");
+          });
+      });
+      it("PATCH / will respond with an updated votes value when other key value pairs are also in the body", () => {
+        return request(app)
+          .patch("/api/articles/5")
+          .send({ inc_votes: 7, name: "Ikra" })
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article).to.be.an("object");
+            expect(article.votes).to.equal(7);
+            expect(article).to.contain.keys(["article_id", "body", "votes"]);
+          });
+      });
+      it("POST / will respond with ");
     });
   });
 });
