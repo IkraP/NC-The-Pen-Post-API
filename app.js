@@ -9,7 +9,15 @@ app.all("/*", send404Error);
 
 app.use((err, request, response, next) => {
   console.log(err, "error handling");
-  response.status(err.status).send({ msg: err.msg });
+  if (err.status) response.status(err.status).send({ msg: err.msg });
+  else next(err);
+});
+
+app.use((err, request, response, next) => {
+  const psqlCodes = { "22P02": "Bad request" };
+  if (psqlCodes[err.code])
+    response.status(400).send({ msg: psqlCodes[err.code] });
+  next(err);
 });
 
 module.exports = app;

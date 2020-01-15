@@ -65,8 +65,9 @@ describe("/api", () => {
         return request(app)
           .get("/api/users/sadiyahKal")
           .expect(404)
-          .then(user_response => {
-            expect(user_response.body.msg).to.equal("Invalid username");
+          .then(({ body: { msg } }) => {
+            console.log(msg);
+            expect(msg).to.equal("Invalid username");
           });
       });
       it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
@@ -84,7 +85,7 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
-    describe.only("/:article_id", () => {
+    describe("/:article_id", () => {
       it("GET / will respond with a status code of 200", () => {
         return request(app)
           .get("/api/articles/1")
@@ -113,8 +114,21 @@ describe("/api", () => {
           .get("/api/articles/999999")
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Invalid article");
+            expect(msg).to.equal("Article doesn't exist");
           });
+      });
+      it("GET / will respond with a 400 Bad request when no article_id is specified", () => {
+        return request(app)
+          .get("/api/articles/notanid")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request");
+          });
+      });
+      it.only("PATCH / will respond with a 200 when article has been updated with votes", () => {
+        return request(app)
+          .patch("/api/articles/2")
+          .expect(200);
       });
     });
   });

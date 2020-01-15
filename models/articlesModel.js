@@ -17,10 +17,10 @@ const selectArticleById = article_id => {
       return formattedCount;
     })
     .then(article => {
-      if (!article) {
+      if (article.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: "Invalid article"
+          msg: "Article doesn't exist"
         });
       } else return article;
     });
