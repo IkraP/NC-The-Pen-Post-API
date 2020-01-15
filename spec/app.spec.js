@@ -130,6 +130,12 @@ describe("/api", () => {
           .patch("/api/articles/2")
           .expect(200);
       });
+      it("PATCH / ");
+      it("PATCH / will respond 400 Bad request", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .expect(400);
+      });
     });
   });
 });

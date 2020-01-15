@@ -26,11 +26,15 @@ const selectArticleById = article_id => {
     });
 };
 
-const changeVotes = (inc_votes, article_id) => {
-  return connection("articles")
-    .where("article_id", article_id)
-    .increment("votes", inc_votes)
-    .returning("*");
+const changeVotes = (inc_votes = 0, article_id) => {
+  if (!inc_votes)
+    return connection("articles")
+      .where("article_id", article_id)
+      .increment("votes", inc_votes)
+      .returning("*")
+      .then(articles => {
+        return articles[0];
+      });
 };
 
 module.exports = { selectArticleById, changeVotes };

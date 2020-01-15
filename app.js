@@ -10,7 +10,7 @@ app.use("/api", apiRouter);
 app.all("/*", send404Error);
 
 app.use((err, request, response, next) => {
-  console.log(err, "error handling");
+  // console.log(err, "error handling");
   if (err.status) response.status(err.status).send({ msg: err.msg });
   else next(err);
 });

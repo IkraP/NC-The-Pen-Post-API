@@ -10,9 +10,10 @@ const sendArticleById = (request, response, next) => {
 const updateVotes = (request, response, next) => {
   const { article_id } = request.params;
   const { inc_votes } = request.body;
+  console.log(inc_votes);
   changeVotes(inc_votes, article_id)
-    .then(updated => response.status(200).send({ updated }))
-    .catch(err => next(err));
+    .then(article => response.status(200).send({ article }))
+    .catch(err => console.log(err));
 };
 
 module.exports = { sendArticleById, updateVotes };
