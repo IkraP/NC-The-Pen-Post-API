@@ -3,6 +3,8 @@ const app = express();
 const apiRouter = require("./routers /apiRouter");
 const { send404Error } = require("./error_functions/errors");
 
+app.use(express.json());
+
 app.use("/api", apiRouter);
 
 app.all("/*", send404Error);

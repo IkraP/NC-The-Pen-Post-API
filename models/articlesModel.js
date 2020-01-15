@@ -26,4 +26,11 @@ const selectArticleById = article_id => {
     });
 };
 
-module.exports = { selectArticleById };
+const changeVotes = (inc_votes, article_id) => {
+  return connection("articles")
+    .where("article_id", article_id)
+    .increment("votes", inc_votes)
+    .returning("*");
+};
+
+module.exports = { selectArticleById, changeVotes };

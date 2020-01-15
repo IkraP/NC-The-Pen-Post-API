@@ -1,4 +1,4 @@
-const { selectArticleById } = require("../models/articlesModel");
+const { selectArticleById, changeVotes } = require("../models/articlesModel");
 
 const sendArticleById = (request, response, next) => {
   const { article_id } = request.params;
@@ -7,4 +7,12 @@ const sendArticleById = (request, response, next) => {
     .catch(err => next(err));
 };
 
-module.exports = { sendArticleById };
+const updateVotes = (request, response, next) => {
+  const { article_id } = request.params;
+  const { inc_votes } = request.body;
+  changeVotes(inc_votes, article_id)
+    .then(updated => response.status(200).send({ updated }))
+    .catch(err => next(err));
+};
+
+module.exports = { sendArticleById, updateVotes };

@@ -85,7 +85,7 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
-    describe("/:article_id", () => {
+    describe.only("/:article_id", () => {
       it("GET / will respond with a status code of 200", () => {
         return request(app)
           .get("/api/articles/1")
@@ -125,7 +125,7 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request");
           });
       });
-      it.only("PATCH / will respond with a 200 when article has been updated with votes", () => {
+      it("PATCH / will respond with a 200 when article has been updated with votes", () => {
         return request(app)
           .patch("/api/articles/2")
           .expect(200);
