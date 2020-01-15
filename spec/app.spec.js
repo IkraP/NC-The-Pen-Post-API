@@ -55,7 +55,7 @@ describe("/api", () => {
       it("GET / will respond with a user object", () => {
         return request(app)
           .get("/api/users/icellusedkars")
-          .then(({ body: { users } }) => {
+          .then(({ body: { user } }) => {
             expect(user).to.be.an("object");
             expect(user).to.have.keys(["username", "avatar_url", "name"]);
             expect(user.name).to.equal("sam");
@@ -93,9 +93,9 @@ describe("/api", () => {
       it("GET / will respond with an article object with required keys", () => {
         return request(app)
           .get("/api/articles/1")
-          .then(article_response => {
-            expect(article_response.body.article).to.be.an("object");
-            expect(article_response.body.article).to.have.keys([
+          .then(({ body: { article } }) => {
+            expect(article).to.be.an("array");
+            expect(article[0]).to.have.keys([
               "author",
               "title",
               "article_id",
@@ -105,9 +105,15 @@ describe("/api", () => {
               "votes",
               "comment_count"
             ]);
-            expect(article_response.body.article.author).to.equal(
-              "butter_bridge"
-            );
+            expect(article[0].author).to.equal("butter_bridge");
+          });
+      });
+      it("GET / will respond with a 404 not found when an article doesn't exist", () => {
+        return request(app)
+          .get("/api/articles/999999")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Invalid article");
           });
       });
     });

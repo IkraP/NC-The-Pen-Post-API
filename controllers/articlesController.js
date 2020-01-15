@@ -2,8 +2,9 @@ const { selectArticleById } = require("../models/articlesModel");
 
 const sendArticleById = (request, response, next) => {
   const { article_id } = request.params;
-  selectArticleById(article_id);
-  response.status(200).send();
+  selectArticleById(article_id)
+    .then(article => response.status(200).send({ article }))
+    .catch(errr => next(err));
 };
 
 module.exports = { sendArticleById };
