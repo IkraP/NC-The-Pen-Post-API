@@ -290,11 +290,18 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("created_at");
           });
       });
-      it.only("GET / will respond with the sorted array when a column is specified in the query", () => {
+      it("GET / will respond with the sorted array when a column is specified in the query", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=votes")
           .then(({ body: { comments } }) => {
-            console.log(comments);
+            expect(comments).to.be.sortedBy("votes");
+          });
+      });
+      it("GET / will respond with invalid column when sorted query column doesn't exist", () => {
+        return request(app)
+          .get("/api/articles/5/comments?sort_by=ikra")
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Column doesn't exist");
           });
       });
     });

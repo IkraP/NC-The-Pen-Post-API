@@ -58,7 +58,7 @@ const postComments = newComment => {
     });
 };
 
-const selectCommentByArticleId = (article_id, { sort_by = "created_at" }) => {
+const selectCommentByArticleId = (article_id, sort_by = "created_at") => {
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
@@ -80,11 +80,3 @@ module.exports = {
   postComments,
   selectCommentByArticleId
 };
-
-// knex("users").whereExists(
-//   knex
-//     .select("*")
-//     .from("accounts")
-//     .whereRaw("users.account_id = accounts.id")
-// .whereExists(knex.select('*').from('filters as f').whereRaw('u.gender = f.female'))
-// );
