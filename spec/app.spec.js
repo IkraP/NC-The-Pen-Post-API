@@ -244,10 +244,24 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request: Missing required field");
           });
       });
-      it.only("GET / will respond with 200 when array of comments is returned to client for a given article_id", () => {
+      it("GET / will respond with 200 when array of comments is returned to client for a given article_id", () => {
         return request(app)
-          .get("/api/articles/1/comments")
+          .get("/api/articles/5/comments")
           .expect(200);
+      });
+      it.only("GET / will respond with an array of comments with the required keys", () => {
+        return request(app)
+          .get("/api/articles/5/comments")
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.an("array");
+            expect(comments[0]).to.have.keys([
+              "comment_id",
+              "votes",
+              "created_at",
+              "author",
+              "body"
+            ]);
+          });
       });
     });
   });
