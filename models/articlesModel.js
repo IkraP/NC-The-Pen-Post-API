@@ -27,13 +27,30 @@ const selectArticleById = article_id => {
 };
 
 const changeVotes = (article_id, body) => {
-  return connection("articles")
-    .where("article_id", article_id)
-    .increment("votes", body.inc_votes || 0)
+  if (body["inc_votes"] === undefined) {
+    return Promise.reject({
+      status: 404,
+      msg: "Missing required field"
+    });
+  } else {
+    return connection("articles")
+      .where("article_id", article_id)
+      .increment("votes", body.inc_votes || 0)
+      .returning("*")
+      .then(articles => {
+        return articles[0];
+      });
+  }
+};
+
+const postComments = newComment => {
+  console.log(newComment);
+  return connection("comments")
+    .insert(newComment)
     .returning("*")
-    .then(articles => {
-      return articles[0];
+    .then(([comment]) => {
+      return comment;
     });
 };
 
-module.exports = { selectArticleById, changeVotes };
+module.exports = { selectArticleById, changeVotes, postComments };

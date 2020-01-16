@@ -85,7 +85,7 @@ describe("/api", () => {
     });
   });
   describe("/articles", () => {
-    describe.only("/:article_id", () => {
+    describe("/:article_id", () => {
       it("GET / will respond with a status code of 200", () => {
         return request(app)
           .get("/api/articles/1")
@@ -109,7 +109,7 @@ describe("/api", () => {
             expect(article[0].author).to.equal("butter_bridge");
           });
       });
-      it("GET / will respond with a 404 not found when an article doesn't exist", () => {
+      it("GET / will respond with a 404 when an article doesn't exist", () => {
         return request(app)
           .get("/api/articles/999999")
           .expect(404)
@@ -153,9 +153,18 @@ describe("/api", () => {
         return request(app)
           .patch("/api/articles/3")
           .send({ incvotes: 67 })
-          .expect(400)
+          .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Missing required field");
+          });
+      });
+      it("PATCH / will respond with a 404 Not found when the article_id is not specified", () => {
+        return request(app)
+          .patch("/api/articles/")
+          .send({ inc_votes: 8 })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Route not found");
           });
       });
       it("PATCH / will respond with an updated votes value when other key value pairs are also in the body", () => {
@@ -169,7 +178,37 @@ describe("/api", () => {
             expect(article).to.contain.keys(["article_id", "body", "votes"]);
           });
       });
-      it("POST / will respond with ");
+      it("POST / will respond with status 201 to signal a successful post has completed", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "rogersop",
+            body: "This article really speaks to me!"
+          })
+          .expect(201);
+      });
+      it("POST / will respond with a comment object with required keys", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            username: "rogersop",
+            body: "This article really speaks to me!"
+          })
+          .then(({ body: { comment } }) => {
+            expect(comment).to.be.an("object");
+            expect(comment).to.contain.keys(["body", "author", "article_id"]);
+          });
+      });
+      it.only("POST / will respond with a 400 and returns no comment given when no body is given by the client specifying no comment", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({})
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("No comment given");
+          });
+      });
+      it("POST / will respond with a");
     });
   });
 });
