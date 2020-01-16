@@ -29,8 +29,8 @@ const selectArticleById = article_id => {
 const changeVotes = (article_id, body) => {
   if (body["inc_votes"] === undefined) {
     return Promise.reject({
-      status: 404,
-      msg: "Missing required field"
+      status: 400,
+      msg: "Bad request: Missing required field"
     });
   } else {
     return connection("articles")
@@ -44,7 +44,12 @@ const changeVotes = (article_id, body) => {
 };
 
 const postComments = newComment => {
-  console.log(newComment);
+  if (!newComment.author || !newComment.body || !newComment.article_id) {
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request: No comment given"
+    });
+  }
   return connection("comments")
     .insert(newComment)
     .returning("*")
@@ -53,4 +58,10 @@ const postComments = newComment => {
     });
 };
 
-module.exports = { selectArticleById, changeVotes, postComments };
+const selectCommentByArticleId = () => {};
+module.exports = {
+  selectArticleById,
+  changeVotes,
+  postComments,
+  selectCommentByArticleId
+};

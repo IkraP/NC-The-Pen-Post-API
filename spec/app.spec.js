@@ -153,9 +153,9 @@ describe("/api", () => {
         return request(app)
           .patch("/api/articles/3")
           .send({ incvotes: 67 })
-          .expect(404)
+          .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Missing required field");
+            expect(msg).to.equal("Bad request: Missing required field");
           });
       });
       it("PATCH / will respond with a 404 Not found when the article_id is not specified", () => {
@@ -199,16 +199,56 @@ describe("/api", () => {
             expect(comment).to.contain.keys(["body", "author", "article_id"]);
           });
       });
-      it.only("POST / will respond with a 400 and returns no comment given when no body is given by the client specifying no comment", () => {
+      it("POST / will respond with a 400 and returns no comment given when no body is given by the client specifying no comment", () => {
         return request(app)
           .post("/api/articles/1/comments")
           .send({})
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal("No comment given");
+            expect(msg).to.equal("Bad request: No comment given");
           });
       });
-      it("POST / will respond with a");
+      it("POST / will respond with a 400 when the body object doesn't contain the correct keys", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            myfriend: "rogersop",
+            body: "This article really speaks to me!"
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request: No comment given");
+          });
+      });
+      it("PATCH / will respond with a 404 Not found when the article_id is not specified", () => {
+        return request(app)
+          .patch("/api/articles/")
+          .send({
+            username: "rogersop",
+            body: "I really liked this article - well done :)"
+          })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Route not found");
+          });
+      });
+      it("PATCH / will respond with a 400 bad request when no article is specified in the url", () => {
+        return request(app)
+          .patch("/api/articles/comments")
+          .send({
+            username: "rogersop",
+            body: "I really liked it :)"
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request: Missing required field");
+          });
+      });
+      it.only("GET / will respond with 200 when array of comments is returned to client for a given article_id", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200);
+      });
     });
   });
 });

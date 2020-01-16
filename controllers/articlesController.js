@@ -1,7 +1,8 @@
 const {
   selectArticleById,
   changeVotes,
-  postComments
+  postComments,
+  selectCommentByArticleId
 } = require("../models/articlesModel");
 
 const sendArticleById = (request, response, next) => {
@@ -28,15 +29,23 @@ const sendComments = (request, response, next) => {
     .then(comment => {
       response.status(201).send({ comment });
     })
-    .catch(err => console.log(err));
+    .catch(err => next(err));
 };
 
-module.exports = { sendArticleById, updateVotes, sendComments };
+const sendCommentByArticleId = (request, response, next) => {
+  selectCommentByArticleId();
+};
 
-// POST / api / articles /: article_id / comments
-// Request body accepts
-// an object with the following properties:
-// username
-// body
-// Responds with
-// the posted comment
+module.exports = {
+  sendArticleById,
+  updateVotes,
+  sendComments,
+  sendCommentByArticleId
+};
+
+// an array of comments for the given`article_id` of which each comment should have the following properties:
+// - `comment_id`
+//   - `votes`
+//   - `created_at`
+//   - `author` which is the`username` from the users table
+//     - `body`
