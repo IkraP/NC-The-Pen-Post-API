@@ -62,28 +62,19 @@ const checkIfArticleExists = article_id => {
   return connection("articles")
     .select("*")
     .where("article_id", article_id)
-    .returning(true);
+    .returning("*")
+    .then(article => {
+      console.log(article);
+    });
 };
-
-const t = checkIfArticleExists(5);
-console.log(t);
 
 const selectCommentByArticleId = article_id => {
-  // return connection("comments")
-  //   .select("comment_id", "votes", "created_at", "author", "body")
-  //   .where("article_id", article_id)
-  //   .returning("*")
-  //   .then(article => {
-  //     if (article.length === 0) {
-  //       connection
-  //         .select("*")
-  //         .from("articles")
-  //         .where("article_id", article_id);
-  //     } else {
-  //       return article;
-  //     }
-  //   });
+  return connection("comments")
+    .select("comment_id", "votes", "created_at", "author", "body")
+    .where("article_id", article_id)
+    .returning("*");
 };
+
 module.exports = {
   selectArticleById,
   changeVotes,

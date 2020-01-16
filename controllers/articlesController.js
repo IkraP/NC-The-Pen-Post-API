@@ -37,7 +37,7 @@ const sendCommentByArticleId = (request, response, next) => {
 
   selectCommentByArticleId(article_id)
     .then(comments => response.status(200).send({ comments }))
-    .catch(err => console.log(err));
+    .catch(err => next(err));
 };
 
 module.exports = {

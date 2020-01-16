@@ -19,9 +19,14 @@ const sendPSQLError = (err, request, response, next) => {
   next(err);
 };
 
+const send500Error = (err, request, response, next) => {
+  response.status(500).send({ msg: "Internal Server Error" });
+};
+
 module.exports = {
   send404Error,
   send405Error,
   sendCustomError,
-  sendPSQLError
+  sendPSQLError,
+  send500Error
 };
