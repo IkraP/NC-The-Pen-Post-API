@@ -70,7 +70,6 @@ describe("/api", () => {
           .get("/api/users/sadiyahKal")
           .expect(404)
           .then(({ body: { msg } }) => {
-            console.log(msg);
             expect(msg).to.equal("Invalid username");
           });
       });
