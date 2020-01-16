@@ -34,6 +34,7 @@ const sendComments = (request, response, next) => {
 
 const sendCommentByArticleId = (request, response, next) => {
   const { article_id } = request.params;
+
   selectCommentByArticleId(article_id)
     .then(comments => response.status(200).send({ comments }))
     .catch(err => console.log(err));

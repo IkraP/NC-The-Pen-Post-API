@@ -58,12 +58,31 @@ const postComments = newComment => {
     });
 };
 
-const selectCommentByArticleId = article_id => {
-  return connection("comments")
-    .select("comment_id", "votes", "created_at", "author", "body")
+const checkIfArticleExists = article_id => {
+  return connection("articles")
+    .select("*")
     .where("article_id", article_id)
-    .returning("*")
-    .then(t => console.log(t));npm t
+    .returning(true);
+};
+
+const t = checkIfArticleExists(5);
+console.log(t);
+
+const selectCommentByArticleId = article_id => {
+  // return connection("comments")
+  //   .select("comment_id", "votes", "created_at", "author", "body")
+  //   .where("article_id", article_id)
+  //   .returning("*")
+  //   .then(article => {
+  //     if (article.length === 0) {
+  //       connection
+  //         .select("*")
+  //         .from("articles")
+  //         .where("article_id", article_id);
+  //     } else {
+  //       return article;
+  //     }
+  //   });
 };
 module.exports = {
   selectArticleById,
@@ -71,3 +90,11 @@ module.exports = {
   postComments,
   selectCommentByArticleId
 };
+
+// knex("users").whereExists(
+//   knex
+//     .select("*")
+//     .from("accounts")
+//     .whereRaw("users.account_id = accounts.id")
+// .whereExists(knex.select('*').from('filters as f').whereRaw('u.gender = f.female'))
+// );

@@ -220,7 +220,7 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request: No comment given");
           });
       });
-      it("PATCH / will respond with a 404 Not found when the article_id is not specified", () => {
+      it("POST / will respond with a 404 Not found when the article_id is not specified", () => {
         return request(app)
           .patch("/api/articles/")
           .send({
@@ -232,16 +232,16 @@ describe("/api", () => {
             expect(msg).to.equal("Route not found");
           });
       });
-      it("PATCH / will respond with a 400 bad request when no article is specified in the url", () => {
+      it("POST / will respond with a 405 bad request when no article is specified in the url and therefore route not allowed", () => {
         return request(app)
-          .patch("/api/articles/comments")
+          .post("/api/articles/comments")
           .send({
             username: "rogersop",
             body: "I really liked it :)"
           })
-          .expect(400)
+          .expect(405)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad request: Missing required field");
+            expect(msg).to.equal("method not allowed");
           });
       });
       it("GET / will respond with 200 when array of comments is returned to client for a given article_id", () => {
@@ -249,7 +249,7 @@ describe("/api", () => {
           .get("/api/articles/5/comments")
           .expect(200);
       });
-      it("GET / will respond with an array of comments with the required keys", () => {
+      it.only("GET / will respond with an array of comments with the required keys", () => {
         return request(app)
           .get("/api/articles/5/comments")
           .then(({ body: { comments } }) => {
@@ -266,7 +266,7 @@ describe("/api", () => {
       it.only("GET / will respond with no article specified if no article id is specified in the url request", () => {
         return request(app)
           .get("/api/articles/789097/comments")
-          .status(404)
+          .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).equal("Article doesn't exist");
           });
