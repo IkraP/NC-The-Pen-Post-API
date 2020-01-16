@@ -46,9 +46,17 @@ module.exports = {
   sendCommentByArticleId
 };
 
-// an array of comments for the given`article_id` of which each comment should have the following properties:
-// - `comment_id`
-//   - `votes`
-//   - `created_at`
-//   - `author` which is the`username` from the users table
-//     - `body`
+// GET / will respond with a 404 when an article doesn't exist", () => {
+// // return request(app)
+// //   .get("/api/articles/999999")
+//   .expect(404)
+//   .then(({ body: { msg } }) => {
+//     expect(msg).to.equal("Article doesn't exist");
+//   });
+//       });
+// it("GET / will respond with a 400 Bad request when no article_id is specified", () => {
+//   return request(app)
+//     .get("/api/articles/notanid")
+//     .expect(400)
+//     .then(({ body: { msg } }) => {
+//       expect(msg).to.equal("Bad request");

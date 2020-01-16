@@ -62,7 +62,8 @@ const selectCommentByArticleId = article_id => {
   return connection("comments")
     .select("comment_id", "votes", "created_at", "author", "body")
     .where("article_id", article_id)
-    .returning("*");
+    .returning("*")
+    .then(t => console.log(t));npm t
 };
 module.exports = {
   selectArticleById,

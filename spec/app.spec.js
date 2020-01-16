@@ -249,7 +249,7 @@ describe("/api", () => {
           .get("/api/articles/5/comments")
           .expect(200);
       });
-      it.only("GET / will respond with an array of comments with the required keys", () => {
+      it("GET / will respond with an array of comments with the required keys", () => {
         return request(app)
           .get("/api/articles/5/comments")
           .then(({ body: { comments } }) => {
@@ -261,6 +261,14 @@ describe("/api", () => {
               "author",
               "body"
             ]);
+          });
+      });
+      it.only("GET / will respond with no article specified if no article id is specified in the url request", () => {
+        return request(app)
+          .get("/api/articles/789097/comments")
+          .status(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).equal("Article doesn't exist");
           });
       });
     });
