@@ -58,21 +58,20 @@ const postComments = newComment => {
     });
 };
 
-const checkIfArticleExists = article_id => {
-  return connection("articles")
-    .select("*")
-    .where("article_id", article_id)
-    .returning("*")
-    .then(article => {
-      console.log(article);
+const selectCommentByArticleId = (article_id, { sort_by = "created_at" }) => {
+  return selectArticleById(article_id)
+    .then(articleExist => {
+      if (articleExist.length) {
+        return connection("comments")
+          .select("comment_id", "votes", "created_at", "author", "body")
+          .where("article_id", article_id)
+          .returning("*")
+          .orderBy(sort_by, "asc");
+      }
+    })
+    .then(comments => {
+      return comments;
     });
-};
-
-const selectCommentByArticleId = article_id => {
-  return connection("comments")
-    .select("comment_id", "votes", "created_at", "author", "body")
-    .where("article_id", article_id)
-    .returning("*");
 };
 
 module.exports = {

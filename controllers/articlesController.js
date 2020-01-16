@@ -34,8 +34,9 @@ const sendComments = (request, response, next) => {
 
 const sendCommentByArticleId = (request, response, next) => {
   const { article_id } = request.params;
+  const { sort_by } = request.query;
 
-  selectCommentByArticleId(article_id)
+  selectCommentByArticleId(article_id, sort_by)
     .then(comments => response.status(200).send({ comments }))
     .catch(err => next(err));
 };
@@ -46,18 +47,3 @@ module.exports = {
   sendComments,
   sendCommentByArticleId
 };
-
-// GET / will respond with a 404 when an article doesn't exist", () => {
-// // return request(app)
-// //   .get("/api/articles/999999")
-//   .expect(404)
-//   .then(({ body: { msg } }) => {
-//     expect(msg).to.equal("Article doesn't exist");
-//   });
-//       });
-// it("GET / will respond with a 400 Bad request when no article_id is specified", () => {
-//   return request(app)
-//     .get("/api/articles/notanid")
-//     .expect(400)
-//     .then(({ body: { msg } }) => {
-//       expect(msg).to.equal("Bad request");

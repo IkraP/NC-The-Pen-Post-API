@@ -1,8 +1,12 @@
 process.env.NODE_ENV = "test";
-const { expect } = require("chai");
 const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
+const chai = require("chai");
+const { expect } = chai;
+const chaiSorted = require("chai-sorted");
+
+chai.use(chaiSorted);
 
 describe("/api", () => {
   beforeEach(() => connection.seed.run());
@@ -249,7 +253,7 @@ describe("/api", () => {
           .get("/api/articles/5/comments")
           .expect(200);
       });
-      it.only("GET / will respond with an array of comments with the required keys", () => {
+      it("GET / will respond with an array of comments with the required keys", () => {
         return request(app)
           .get("/api/articles/5/comments")
           .then(({ body: { comments } }) => {
@@ -263,12 +267,34 @@ describe("/api", () => {
             ]);
           });
       });
-      it.only("GET / will respond with no article specified if no article id is specified in the url request", () => {
+      it("GET / will respond with no article specified if no article id is specified in the url request", () => {
         return request(app)
           .get("/api/articles/789097/comments")
           .expect(404)
           .then(({ body: { msg } }) => {
             expect(msg).equal("Article doesn't exist");
+          });
+      });
+      it("GET / will respond with a 400 bad request when no article_id is specified", () => {
+        return request(app)
+          .get("/api/articles/noanid/comments")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).equal("Bad request");
+          });
+      });
+      it("GET / will respond with the sorted array that are sorted by created _at by default", () => {
+        return request(app)
+          .get("/api/articles/5/comments")
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.sortedBy("created_at");
+          });
+      });
+      it.only("GET / will respond with the sorted array when a column is specified in the query", () => {
+        return request(app)
+          .get("/api/articles/5/comments?sort_by=votes")
+          .then(({ body: { comments } }) => {
+            console.log(comments);
           });
       });
     });
