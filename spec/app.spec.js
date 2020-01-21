@@ -20,20 +20,18 @@ describe("/api", () => {
     it("GET / will respond a topics array", () => {
       return request(app)
         .get("/api/topics")
-        .then(topics_response => {
-          expect(topics_response.body.topics).to.be.an("array");
-          expect(topics_response.body.topics[0]).to.have.keys([
-            "slug",
-            "description"
-          ]);
+        .then(({ body: { topics } }) => {
+          expect(topics).to.be.an("array");
+          expect(topics.length).to.equal(3);
+          expect(topics[0]).to.have.keys(["slug", "description"]);
         });
     });
     it("GET / will respond with 404 Invalid request when the url is invalid", () => {
       return request(app)
         .get("/api/not-a-valid-url")
         .expect(404)
-        .then(topics_response => {
-          expect(topics_response.body.msg).to.equal("Route not found");
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("Route not found");
         });
     });
     it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
@@ -56,7 +54,7 @@ describe("/api", () => {
           .get("/api/users/icellusedkars")
           .expect(200);
       });
-      it("GET / will respond with a user object", () => {
+      it("GET / will respond with a user array", () => {
         return request(app)
           .get("/api/users/icellusedkars")
           .then(({ body: { user } }) => {
@@ -289,11 +287,19 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("created_at");
           });
       });
-      it("GET / will respond with the sorted array when a column is specified in the query", () => {
+      it("GET / will respond with the sorted array when votes column is specified in the query", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=votes")
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("votes");
+          });
+      });
+      it("GET / will respond with the sorted array when the author column is specified in the query", () => {
+        return request(app)
+          .get("/api/articles/5/comments?sory_by=author")
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.sortedBy("author");
+            expect(comments[0].author).to.equal("butter_bridge");
           });
       });
       it("GET / will respond with invalid column when sorted query column doesn't exist", () => {
@@ -301,6 +307,13 @@ describe("/api", () => {
           .get("/api/articles/5/comments?sort_by=ikra")
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Column doesn't exist");
+          });
+      });
+      it.only("GET / will respond with the articles ordered in descending order when no order is specified by the user", () => {
+        return request(app)
+          .get("/api/articles/5/comments?sort_by=author")
+          .then(({ body: { msg } }) => {
+            console.log(msg);
           });
       });
     });

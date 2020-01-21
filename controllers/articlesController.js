@@ -35,6 +35,7 @@ const sendComments = (request, response, next) => {
 const sendCommentByArticleId = (request, response, next) => {
   const { article_id } = request.params;
   const { sort_by } = request.query;
+  console.log(request.query);
 
   selectCommentByArticleId(article_id, sort_by)
     .then(comments => response.status(200).send({ comments }))

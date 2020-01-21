@@ -58,7 +58,11 @@ const postComments = newComment => {
     });
 };
 
-const selectCommentByArticleId = (article_id, sort_by = "created_at") => {
+const selectCommentByArticleId = (
+  article_id,
+  sort_by = "created_at",
+  order_by = "desc"
+) => {
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
