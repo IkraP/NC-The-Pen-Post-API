@@ -34,17 +34,18 @@ const sendComments = (request, response, next) => {
 
 const sendCommentByArticleId = (request, response, next) => {
   const { article_id } = request.params;
-  const { sort_by } = request.query;
-  console.log(request.query);
+  const { sort_by, order } = request.query;
 
-  selectCommentByArticleId(article_id, sort_by)
+  selectCommentByArticleId(article_id, sort_by, order)
     .then(comments => response.status(200).send({ comments }))
     .catch(err => next(err));
 };
 
+const sendAllArticles = () => {};
 module.exports = {
   sendArticleById,
   updateVotes,
   sendComments,
-  sendCommentByArticleId
+  sendCommentByArticleId,
+  sendAllArticles
 };

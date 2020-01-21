@@ -135,10 +135,10 @@ describe("/api", () => {
       it("PATCH / will respond with with the updated article with votes updated", () => {
         return request(app)
           .patch("/api/articles/2")
-          .send({ inc_votes: 10 })
+          .send({ inc_votes: 20 })
           .then(({ body: { article } }) => {
             expect(article).to.be.an("object");
-            expect(article.votes).to.equal(10);
+            expect(article.votes).to.equal(20);
             expect(article).to.contain.keys(["article_id", "body", "votes"]);
           });
       });
@@ -178,6 +178,18 @@ describe("/api", () => {
             expect(article.votes).to.equal(7);
             expect(article).to.contain.keys(["article_id", "body", "votes"]);
           });
+      });
+      it("POST / will respond with a 405 method not allowed when method requested is not valid", () => {
+        const invalidMethods = ["post", "put", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles/1")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
       });
       it("POST / will respond with status 201 to signal a successful post has completed", () => {
         return request(app)
@@ -245,6 +257,18 @@ describe("/api", () => {
             expect(msg).to.equal("method not allowed");
           });
       });
+      it("POST / will respond with 404 not found when the article is a valid ID but doesn't exist in the data", () => {
+        return request(app)
+          .post("/api/articles/456/comments")
+          .send({
+            username: "rogersop",
+            body: "I really like the way you write!"
+          })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Not Found");
+          });
+      });
       it("GET / will respond with 200 when array of comments is returned to client for a given article_id", () => {
         return request(app)
           .get("/api/articles/5/comments")
@@ -284,22 +308,21 @@ describe("/api", () => {
         return request(app)
           .get("/api/articles/5/comments")
           .then(({ body: { comments } }) => {
-            expect(comments).to.be.sortedBy("created_at");
+            expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
       });
       it("GET / will respond with the sorted array when votes column is specified in the query", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=votes")
           .then(({ body: { comments } }) => {
-            expect(comments).to.be.sortedBy("votes");
+            expect(comments).to.be.sortedBy("votes", { descending: true });
           });
       });
       it("GET / will respond with the sorted array when the author column is specified in the query", () => {
         return request(app)
           .get("/api/articles/5/comments?sory_by=author")
           .then(({ body: { comments } }) => {
-            expect(comments).to.be.sortedBy("author");
-            expect(comments[0].author).to.equal("butter_bridge");
+            expect(comments).to.be.sortedBy("author", { descending: true });
           });
       });
       it("GET / will respond with invalid column when sorted query column doesn't exist", () => {
@@ -309,12 +332,35 @@ describe("/api", () => {
             expect(msg).to.equal("Column doesn't exist");
           });
       });
-      it.only("GET / will respond with the articles ordered in descending order when no order is specified by the user", () => {
+      it("GET / will respond with the articles ordered in descending order when no order is specified by the client", () => {
         return request(app)
-          .get("/api/articles/5/comments?sort_by=author")
-          .then(({ body: { msg } }) => {
-            console.log(msg);
+          .get("/api/articles/5/comments?sort_by=comment_id")
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.sortedBy("comment_id", { descending: true });
           });
+      });
+      it("GET / will respond with the articles ordering in ascending when order is specified by the client", () => {
+        return request(app)
+          .get("/api/articles/1/comments?sort_by=comment_id&order=asc")
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.sortedBy("comment_id", { ascending: true });
+          });
+      });
+      it("GET / will respond with order as default descending when order specified is not asc or desc", () => {
+        return request(app)
+          .get("/api/articles/5/comments?sort_by=votes&order=kjasbfjkabf")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            // ignore the order request by client and resort to default
+            expect(comments).to.be.sortedBy("votes", { descending: true });
+          });
+      });
+    });
+    describe("/", () => {
+      it.only("GET / will respond with a 200 when the client requests the articles", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200);
       });
     });
   });

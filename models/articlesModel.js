@@ -61,8 +61,11 @@ const postComments = newComment => {
 const selectCommentByArticleId = (
   article_id,
   sort_by = "created_at",
-  order_by = "desc"
+  order
 ) => {
+  if (order !== "desc" && order !== "asc") {
+    order = "desc";
+  }
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
@@ -70,7 +73,7 @@ const selectCommentByArticleId = (
           .select("comment_id", "votes", "created_at", "author", "body")
           .where("article_id", article_id)
           .returning("*")
-          .orderBy(sort_by, "asc");
+          .orderBy(sort_by, order);
       }
     })
     .then(comments => {

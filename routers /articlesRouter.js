@@ -3,7 +3,8 @@ const {
   sendArticleById,
   updateVotes,
   sendComments,
-  sendCommentByArticleId
+  sendCommentByArticleId,
+  sendAllArticles
 } = require("../controllers/articlesController");
 const { send405Error } = require("../error_functions/errors");
 
@@ -18,5 +19,7 @@ articlesRouter
   .post(sendComments)
   .get(sendCommentByArticleId)
   .all(send405Error);
+
+articlesRouter.route("/").get(sendAllArticles);
 
 module.exports = articlesRouter;
