@@ -2,7 +2,8 @@ const {
   selectArticleById,
   changeVotes,
   postComments,
-  selectCommentByArticleId
+  selectCommentByArticleId,
+  selectAllArticles
 } = require("../models/articlesModel");
 
 const sendArticleById = (request, response, next) => {
@@ -41,7 +42,13 @@ const sendCommentByArticleId = (request, response, next) => {
     .catch(err => next(err));
 };
 
-const sendAllArticles = () => {};
+const sendAllArticles = (request, response, next) => {
+  selectAllArticles()
+    .then(articles => {
+      response.status(200).send(articles);
+    })
+    .catch(err => next(err));
+};
 module.exports = {
   sendArticleById,
   updateVotes,

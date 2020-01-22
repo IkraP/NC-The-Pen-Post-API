@@ -84,9 +84,38 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
     });
 };
 
+const selectAllArticles = () =>
+  // sort_by = "created_at",
+  // order = "desc",
+  // author,
+  // topic
+  {
+    return (
+      connection
+        .select("articles.*")
+        .from("articles")
+        .leftJoin("comments", "articles.article_id", "comments.article_id")
+        .groupBy("articles.article_id")
+        // .orderBy(sort_by, order)
+        .count("comment_id as comment_count")
+        .modify(query => {
+          if (author) query.where("articles_author", author);
+        })
+        .then(commentCount => {
+          const formattedCount = commentCount.map(
+            ({ comment_count, ...restOfArticle }) => {
+              delete restOfArticle.body;
+              return { ...restOfArticle, comment_count: +comment_count };
+            }
+          );
+          return formattedCount;
+        })
+    );
+  };
 module.exports = {
   selectArticleById,
   changeVotes,
   postComments,
-  selectCommentByArticleId
+  selectCommentByArticleId,
+  selectAllArticles
 };

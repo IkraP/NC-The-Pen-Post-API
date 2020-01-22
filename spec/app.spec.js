@@ -362,6 +362,31 @@ describe("/api", () => {
           .get("/api/articles")
           .expect(200);
       });
+      it("GET / will respond with an articles array of article objects with required keys", () => {
+        return request(app)
+          .get("/api/articles")
+          .then(articles => {
+            expect(articles.body).to.be.an("array");
+            expect(articles.body[0]).to.have.keys([
+              "author",
+              "title",
+              "article_id",
+              "topic",
+              "created_at",
+              "votes",
+              "comment_count"
+            ]);
+          });
+      });
+      it("GET / will accept sort_by queries by valid columns in the articles object", () => {
+        return request(app).get("/api/articles");
+      });
+      it("GET / will have a default sort_by column of date when no sort_by is specified by user", () => {});
     });
   });
 });
+
+// no sort_by errors
+// order asc and desc again
+// filters articles based on author
+//topic filters articles based on topic specified in query
