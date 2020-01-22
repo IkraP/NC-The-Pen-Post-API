@@ -325,18 +325,18 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("author", { descending: true });
           });
       });
-      it("GET / will respond with invalid column when sorted query column doesn't exist", () => {
+      it("GET / will respond with the default sort by column which is created_at when the client given query column doesn't exist", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=ikra")
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Column doesn't exist");
+          .then(({ body: { comments } }) => {
+            expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
       });
       it("GET / will respond with the articles ordered in descending order when no order is specified by the client", () => {
         return request(app)
-          .get("/api/articles/5/comments?sort_by=comment_id")
+          .get("/api/articles/5/comments?sort_by=created_at")
           .then(({ body: { comments } }) => {
-            expect(comments).to.be.sortedBy("comment_id", { descending: true });
+            expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
       });
       it("GET / will respond with the articles ordering in ascending when order is specified by the client", () => {
@@ -356,8 +356,8 @@ describe("/api", () => {
           });
       });
     });
-    describe("/", () => {
-      it.only("GET / will respond with a 200 when the client requests the articles", () => {
+    describe.only("/", () => {
+      it("GET / will respond with a 200 when the client requests the articles", () => {
         return request(app)
           .get("/api/articles")
           .expect(200);

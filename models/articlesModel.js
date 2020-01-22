@@ -58,14 +58,17 @@ const postComments = newComment => {
     });
 };
 
-const selectCommentByArticleId = (
-  article_id,
-  sort_by = "created_at",
-  order
-) => {
-  if (order !== "desc" && order !== "asc") {
-    order = "desc";
-  }
+const selectCommentByArticleId = (article_id, sort_by, order) => {
+  // default values set for order and sort_by queries
+  if (order !== "asc" || order !== "desc") order = "desc";
+  if (
+    (sort_by !== "comment_id" ||
+      sort_by !== "votes" ||
+      sort_by !== "created_at" ||
+      sort_by !== "author",
+    sort_by !== "body")
+  )
+    sort_by = "created_at";
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
