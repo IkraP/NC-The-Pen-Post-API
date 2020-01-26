@@ -379,7 +379,7 @@ describe("/api", () => {
           });
       });
       it("GET / will accept sort_by queries by valid columns in the articles object", () => {
-        return request(app).get("/api/articles");
+        return request(app).get("/api/articles?sort_by=author");
       });
       it("GET / will have a default sort_by column of date when no sort_by is specified by user", () => {});
     });
