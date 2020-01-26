@@ -6,8 +6,8 @@ NC News is a project created for the back-end block of the Northcoders bootcamp 
 
 ### Prerequisites:
 
-- **node** (download [here](https://nodejs.org/en/))
-- **git** (download [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git))
+- **Node** (download [here](https://nodejs.org/en/))
+- **Git** (download [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git))
 - **PostgreSQL** (download [here](https://www.postgresql.org/download/))
 - **API Testing tool** (Insomnia, Postman etc)
 
