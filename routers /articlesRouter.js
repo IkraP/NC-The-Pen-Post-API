@@ -20,6 +20,9 @@ articlesRouter
   .get(sendCommentByArticleId)
   .all(send405Error);
 
-articlesRouter.route("/").get(sendAllArticles);
+articlesRouter
+  .route("/")
+  .get(sendAllArticles)
+  .all(send405Error);
 
 module.exports = articlesRouter;
