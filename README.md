@@ -38,6 +38,27 @@ npm run setup-dbs
 npm run seed
 ```
 
+## Routes:
+
+```http
+GET /api/topics
+
+GET /api/users/:username
+
+GET /api/articles/:article_id
+PATCH /api/articles/:article_id
+
+POST /api/articles/:article_id/comments
+GET /api/articles/:article_id/comments
+
+GET /api/articles
+
+PATCH /api/comments/:comment_id
+DELETE /api/comments/:comment_id
+
+GET /api
+```
+
 ## Test Suite:
 
 **NC-news-api** has a suite of tests that have been used to check the functionality of endpoints of the server, error handling and any utility functions that were used to seed the data. The scripts are already present in this repository. Please follow the command below to run tests:
