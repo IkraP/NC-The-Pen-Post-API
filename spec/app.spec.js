@@ -374,19 +374,70 @@ describe("/api", () => {
               "topic",
               "created_at",
               "votes",
-              "comment_count"
+              "comment_count",
+              "total_count"
             ]);
           });
       });
-      it("GET / will accept sort_by queries by valid columns in the articles object", () => {
-        return request(app).get("/api/articles?sort_by=author");
+      it("GET / will respond with the comment_count will respond with the total count of all the comments with this article_id", () => {
+        return request(app)
+          .get("/api/articles")
+          .then(articles => {
+            expect(articles.body[0].comment_count).to.equal(7);
+          });
       });
-      it("GET / will have a default sort_by column of date when no sort_by is specified by user", () => {});
+      it("GET / will accept sort_by queries by valid columns in the articles object", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .then(articles => {
+            expect(({ body: { articles } }) => {
+              expect(articles).to.be.sortedBy("author", { descending: true });
+            });
+          });
+      });
+      it("GET / will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
+        return request(app)
+          .get("/api/articles")
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.sortedBy("created_at", { descending: true });
+          });
+      });
+      it("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author&order=asc")
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.sortedBy("author", { descending: false });
+          });
+      });
+      it("GET / will default the order query to desc when order is not specified by client", () => {
+        return request(app)
+          .get("/api/articles")
+          .then(({ body: { articles } }) => {
+            console.log(articles);
+            expect(articles).to.be.sortedBy({ descending: true });
+          });
+      });
+      it("GET / will filter articles based on author specified by client", () => {
+        return request(app)
+          .get("/api/articles?author=??????????")
+          .then(({ body: { articles } }) => {
+            console.log(articles);
+            expect(articles).to.be.sortedBy("????");
+          });
+      });
+      it("GET / will respond with error with author doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?author=Sadiyah")
+          .then(({ body: { msg } }) => {
+            console.log(articles);
+            expect(msg).to.equal("The author doesn't exist");
+          });
+      });
+      it("GET / will respond with topic ");
     });
   });
 });
 
-// no sort_by errors
-// order asc and desc again
+// HOW to check if an author exists
 // filters articles based on author
 //topic filters articles based on topic specified in query
