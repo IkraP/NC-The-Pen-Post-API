@@ -84,10 +84,8 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
     });
 };
 
-const selectAllArticles = () =>
-  sort_by = "created_at",
-  author
-  topic
+const selectAllArticles = (sort_by = "created_at", author,topic)
+  =>
   {
     if (order !== "asc" || order !== "desc") order = "desc";
     return connection
