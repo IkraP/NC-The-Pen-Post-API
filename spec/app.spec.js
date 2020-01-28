@@ -20,6 +20,7 @@ describe("/api", () => {
     it("GET / will respond a topics array", () => {
       return request(app)
         .get("/api/topics")
+        .expect(200)
         .then(({ body: { topics } }) => {
           expect(topics).to.be.an("array");
           expect(topics.length).to.equal(3);
@@ -57,6 +58,7 @@ describe("/api", () => {
       it("GET / will respond with a user array", () => {
         return request(app)
           .get("/api/users/icellusedkars")
+          .expect(200)
           .then(({ body: { user } }) => {
             expect(user).to.be.an("object");
             expect(user).to.have.keys(["username", "avatar_url", "name"]);
@@ -95,6 +97,7 @@ describe("/api", () => {
       it("GET / will respond with an article object with required keys", () => {
         return request(app)
           .get("/api/articles/1")
+          .expect(200)
           .then(({ body: { article } }) => {
             expect(article).to.be.an("array");
             expect(article[0]).to.have.keys([
@@ -130,11 +133,12 @@ describe("/api", () => {
         return request(app)
           .patch("/api/articles/2")
           .send({ inc_votes: 10 })
-          .expect(200);
+          .expect(202);
       });
       it("PATCH / will respond with with the updated article with votes updated", () => {
         return request(app)
           .patch("/api/articles/2")
+          .expect(202)
           .send({ inc_votes: 20 })
           .then(({ body: { article } }) => {
             expect(article).to.be.an("object");
@@ -145,6 +149,7 @@ describe("/api", () => {
       it("PATCH / will respond with a 400 when request body does not contain inc_vote specifically and characters that do not match the required value", () => {
         return request(app)
           .patch("/api/articles/4")
+          .expect(400)
           .send({ inc_votes: "ikra" })
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("Bad request");
@@ -159,20 +164,11 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request: Missing required field");
           });
       });
-      it("PATCH / will respond with a 404 Not found when the article_id is not specified", () => {
-        return request(app)
-          .patch("/api/articles/")
-          .send({ inc_votes: 8 })
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Route not found");
-          });
-      });
       it("PATCH / will respond with an updated votes value when other key value pairs are also in the body", () => {
         return request(app)
           .patch("/api/articles/5")
           .send({ inc_votes: 7, name: "Ikra" })
-          .expect(200)
+          .expect(202)
           .then(({ body: { article } }) => {
             expect(article).to.be.an("object");
             expect(article.votes).to.equal(7);
@@ -203,6 +199,7 @@ describe("/api", () => {
       it("POST / will respond with a comment object with required keys", () => {
         return request(app)
           .post("/api/articles/1/comments")
+          .expect(201)
           .send({
             username: "rogersop",
             body: "This article really speaks to me!"
@@ -233,18 +230,22 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request: No comment given");
           });
       });
-      it("POST / will respond with a 404 Not found when the article_id is not specified", () => {
-        return request(app)
-          .patch("/api/articles/")
-          .send({
-            username: "rogersop",
-            body: "I really liked this article - well done :)"
-          })
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Route not found");
-          });
-      });
+      //AS METHOD NOT ALLOWED
+
+      //ALSO IN PATCH???
+      // it.only("POST / will respond with a 404 Not found when the article_id is not specified", () => {
+      //   return request(app)
+      //     .patch("/api/articles/")
+      //     .send({
+      //       username: "rogersop",
+      //       body: "I really liked this article - well done :)"
+      //     })
+      //     .expect(404)
+      //     .then(({ body: { msg } }) => {
+      //       console.log(msg);
+      //       expect(msg).to.equal("Route not found");
+      //     });
+      // });
       it("POST / will respond with a 405 bad request when no article is specified in the url and therefore route not allowed", () => {
         return request(app)
           .post("/api/articles/comments")
@@ -277,6 +278,7 @@ describe("/api", () => {
       it("GET / will respond with an array of comments with the required keys", () => {
         return request(app)
           .get("/api/articles/5/comments")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.an("array");
             expect(comments[0]).to.have.keys([
@@ -298,7 +300,7 @@ describe("/api", () => {
       });
       it("GET / will respond with a 400 bad request when no article_id is specified", () => {
         return request(app)
-          .get("/api/articles/noanid/comments")
+          .get("/api/articles/notanid/comments")
           .expect(400)
           .then(({ body: { msg } }) => {
             expect(msg).equal("Bad request");
@@ -307,6 +309,7 @@ describe("/api", () => {
       it("GET / will respond with the sorted array that are sorted by created _at by default", () => {
         return request(app)
           .get("/api/articles/5/comments")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
@@ -314,13 +317,15 @@ describe("/api", () => {
       it("GET / will respond with the sorted array when votes column is specified in the query", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=votes")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("votes", { descending: true });
           });
       });
       it("GET / will respond with the sorted array when the author column is specified in the query", () => {
         return request(app)
-          .get("/api/articles/5/comments?sory_by=author")
+          .get("/api/articles/5/comments?sort_by=author")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("author", { descending: true });
           });
@@ -328,6 +333,7 @@ describe("/api", () => {
       it("GET / will respond with the default sort by column which is created_at when the client given query column doesn't exist", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=ikra")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
@@ -335,6 +341,7 @@ describe("/api", () => {
       it("GET / will respond with the articles ordered in descending order when no order is specified by the client", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=created_at")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
@@ -342,6 +349,7 @@ describe("/api", () => {
       it("GET / will respond with the articles ordering in ascending when order is specified by the client", () => {
         return request(app)
           .get("/api/articles/1/comments?sort_by=comment_id&order=asc")
+          .expect(200)
           .then(({ body: { comments } }) => {
             expect(comments).to.be.sortedBy("comment_id", { ascending: true });
           });
@@ -377,26 +385,27 @@ describe("/api", () => {
       it("GET / will respond with an articles array of article objects with required keys", () => {
         return request(app)
           .get("/api/articles")
+          .expect(200)
           .then(articles => {
-            expect(articles.body).to.be.an("array");
-            expect(articles.body[0]).to.have.keys([
+            expect(articles.body.articles).to.be.an("array");
+            expect(articles.body.articles[0]).to.have.keys([
               "author",
               "title",
               "article_id",
               "topic",
               "created_at",
               "votes",
-              "comment_count",
-              "total_count"
+              "comment_count"
             ]);
+            expect(articles.body.total_count).to.be.an("Number");
           });
       });
       it("GET / will respond with 404 Invalid request when the url is invalid", () => {
         return request(app)
           .get("/api/articles/not-a-valid-url")
-          .expect(404)
+          .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Route not found");
+            expect(msg).to.equal("Bad request");
           });
       });
       it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
@@ -411,16 +420,10 @@ describe("/api", () => {
         });
         return Promise.all(methodPromises);
       });
-      it("GET / will respond with the comment_count will respond with the total count of all the comments with this article_id", () => {
-        return request(app)
-          .get("/api/articles")
-          .then(articles => {
-            expect(articles.body[0].comment_count).to.equal(7);
-          });
-      });
       it("GET / will accept sort_by queries by valid columns in the articles object", () => {
         return request(app)
           .get("/api/articles?sort_by=author")
+          .expect(200)
           .then(articles => {
             expect(({ body: { articles } }) => {
               expect(articles).to.be.sortedBy("author", { descending: true });
@@ -430,20 +433,24 @@ describe("/api", () => {
       it("GET / will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
         return request(app)
           .get("/api/articles")
+          .expect(200)
           .then(({ body: { articles } }) => {
             expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
+      it.only("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
         return request(app)
           .get("/api/articles?sort_by=author&order=asc")
-          .then(({ body: { articles } }) => {
+          .expect(200)
+          .then(articles => {
+            console.log(articles.body);
             expect(articles).to.be.sortedBy("author", { descending: false });
           });
       });
       it("GET / will default the order query to desc when order is not specified by client", () => {
         return request(app)
           .get("/api/articles")
+          .expect(200)
           .then(({ body: { articles } }) => {
             console.log(articles);
             expect(articles).to.be.sortedBy({ descending: true });
@@ -452,6 +459,7 @@ describe("/api", () => {
       it("GET / will filter articles based on author specified by client", () => {
         return request(app)
           .get("/api/articles?author=??????????")
+          .expect(200)
           .then(({ body: { articles } }) => {
             console.log(articles);
             expect(articles).to.be.sortedBy("????");
@@ -460,6 +468,7 @@ describe("/api", () => {
       it("GET / will respond with error with author doesn't exist", () => {
         return request(app)
           .get("/api/articles?author=Sadiyah")
+          .expect(404)
           .then(({ body: { msg } }) => {
             console.log(articles);
             expect(msg).to.equal("Author doesn't exist");

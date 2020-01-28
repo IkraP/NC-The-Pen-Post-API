@@ -7,7 +7,7 @@ const send405Error = (request, response, next) => {
 };
 
 const sendCustomError = (err, request, response, next) => {
-  // console.log(err, "error handling");
+  console.log(err, "error handling");
   if (err.status) response.status(err.status).send({ msg: err.msg });
   else next(err);
 };
