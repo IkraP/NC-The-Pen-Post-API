@@ -86,26 +86,29 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
 
 const selectAllArticles = (sort_by = "created_at", author, topic) => {
   if (order !== "asc" || order !== "desc") order = "desc";
-  return connection
-    .select("articles.*")
-    .from("articles")
-    .leftJoin("comments", "articles.article_id", "comments.article_id")
-    .orderBy(sort_by, order)
-    .groupBy("articles.article_id")
-    .count("comment_id as comment_count")
-    .modify(query => {
-      if (author) query.where("articles_author", author);
-      if (topic) query.where({ topic });
-    })
-    .then(commentCount => {
-      const formattedCount = commentCount.map(
-        ({ comment_count, ...restOfArticle }) => {
-          delete restOfArticle.body;
-          return { ...restOfArticle, comment_count: +comment_count };
-        }
-      );
-      return formattedCount;
-    });
+  return (
+    connection
+      .select("articles.*")
+      .from("articles")
+      .leftJoin("comments", "articles.article_id", "comments.article_id")
+      .orderBy(sort_by, order)
+      .groupBy("articles.article_id")
+      .count("comment_id as comment_count")
+      .modify(query => {
+        if (author) query.where("articles_author", author);
+        if (topic) query.where({ topic });
+      })
+      //articles
+      .then(commentCount => {
+        const formattedCount = commentCount.map(
+          ({ comment_count, ...restOfArticle }) => {
+            delete restOfArticle.body;
+            return { ...restOfArticle, comment_count: +comment_count };
+          }
+        );
+        return formattedCount;
+      })
+  );
 };
 
 module.exports = {

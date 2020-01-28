@@ -179,7 +179,7 @@ describe("/api", () => {
             expect(article).to.contain.keys(["article_id", "body", "votes"]);
           });
       });
-      it("POST / will respond with a 405 method not allowed when method requested is not valid", () => {
+      it("PATCH / will respond with a 405 method not allowed when method requested is not valid", () => {
         const invalidMethods = ["post", "put", "delete"];
         const methodPromises = invalidMethods.map(method => {
           return request(app)
@@ -356,7 +356,19 @@ describe("/api", () => {
           });
       });
     });
-    describe.only("/", () => {
+    it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
+      const invalidMethods = ["patch", "put", "delete"];
+      const methodPromises = invalidMethods.map(method => {
+        return request(app)
+          [method]("/api/articles/1/comments")
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("method not allowed");
+          });
+      });
+      return Promise.all(methodPromises);
+    });
+    describe("/", () => {
       it("GET / will respond with a 200 when the client requests the articles", () => {
         return request(app)
           .get("/api/articles")
@@ -378,6 +390,26 @@ describe("/api", () => {
               "total_count"
             ]);
           });
+      });
+      it("GET / will respond with 404 Invalid request when the url is invalid", () => {
+        return request(app)
+          .get("/api/articles/not-a-valid-url")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Route not found");
+          });
+      });
+      it("GET / will respond with a 405 method not allowed when method requested is not valid", () => {
+        const invalidMethods = ["patch", "put", "delete", "post"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/articles")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
       });
       it("GET / will respond with the comment_count will respond with the total count of all the comments with this article_id", () => {
         return request(app)
@@ -430,14 +462,14 @@ describe("/api", () => {
           .get("/api/articles?author=Sadiyah")
           .then(({ body: { msg } }) => {
             console.log(articles);
-            expect(msg).to.equal("The author doesn't exist");
+            expect(msg).to.equal("Author doesn't exist");
           });
       });
-      it("GET / will respond with topic ");
+      it("GET / will respond with articles by a certain topic when client specifies the topic", () => {
+        return request(app);
+      });
     });
   });
 });
 
 // HOW to check if an author exists
-// filters articles based on author
-//topic filters articles based on topic specified in query
