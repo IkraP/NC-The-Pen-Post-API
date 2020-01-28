@@ -438,16 +438,15 @@ describe("/api", () => {
             expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it.only("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
+      xit("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
         return request(app)
-          .get("/api/articles?sort_by=author&order=asc")
+          .get("/api/articles?sort_by=comment_count&order=asc")
           .expect(200)
-          .then(articles => {
-            console.log(articles.body);
-            expect(articles).to.be.sortedBy("author", { descending: false });
+          .then(({ body: articles }) => {
+            expect(articles).to.be.sortedBy("comment_count");
           });
       });
-      it("GET / will default the order query to desc when order is not specified by client", () => {
+      it.only("GET / will default the order query to desc when order is not specified by client", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
