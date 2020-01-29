@@ -471,15 +471,13 @@ describe("/api", () => {
           });
       });
       it.only("GET / will respond with error with author doesn't exist", () => {
-        return (
-          request(app)
-            .get("/api/articles?author=sadiyah")
-            // .expect(404)
-            .then(({ body: { msg } }) => {
-              console.log(msg);
-              expect(msg).to.equal("Invalid Input - resource doesn't exist");
-            })
-        );
+        return request(app)
+          .get("/api/articles?author=sadiyah")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            console.log(msg);
+            expect(msg).to.equal("Invalid Input - resource doesn't exist");
+          });
       });
       it("GET / will respond with articles by a certain topic when client specifies the topic", () => {
         return request(app);

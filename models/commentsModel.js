@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-const patchCommentbyId = (comment_id, inc_votes) => {
+exports.patchCommentbyId = (comment_id, inc_votes) => {
   // newVote - how much the votes will need updating
   return connection
     .select("*")
@@ -16,11 +16,10 @@ const patchCommentbyId = (comment_id, inc_votes) => {
   //return an object
 };
 
-const deleteCommentById = comment_id => {
+exports.deleteCommentById = comment_id => {
   return connection("comments")
     .where("comment_id", comment_id)
     .del()
     .then // something here to specifiy if no comment that deleted as doesn't exist then something maybe
     ();
 };
-module.exports = { patchCommentbyId, deleteCommentById };

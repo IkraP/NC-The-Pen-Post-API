@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-const selectArticleById = article_id => {
+exports.selectArticleById = article_id => {
   return connection
     .select("articles.*")
     .from("articles")
@@ -26,7 +26,7 @@ const selectArticleById = article_id => {
     });
 };
 
-const changeVotes = (article_id, body) => {
+exports.changeVotes = (article_id, body) => {
   if (body["inc_votes"] === undefined) {
     return Promise.reject({
       status: 400,
@@ -43,7 +43,7 @@ const changeVotes = (article_id, body) => {
   }
 };
 
-const postComments = newComment => {
+exports.postComments = newComment => {
   if (!newComment.author || !newComment.body || !newComment.article_id) {
     return Promise.reject({
       status: 400,
@@ -58,7 +58,7 @@ const postComments = newComment => {
     });
 };
 
-const selectCommentByArticleId = (article_id, sort_by, order) => {
+exports.selectCommentByArticleId = (article_id, sort_by, order) => {
   // default values set for order and sort_by queries
   if (order !== "asc" || order !== "desc") order = "desc";
   const columns = ["comment_id", "votes", "created_at", "author", "body"];
@@ -79,7 +79,7 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
     });
 };
 
-const selectAllArticles = (
+exports.selectAllArticles = (
   sort_by = "created_at",
   order = "desc",
   author,
@@ -104,7 +104,7 @@ const selectAllArticles = (
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .orderBy(sort_by, order)
     .groupBy("articles.article_id")
-    .count("comment_id as comment_count")
+    .count({ comment_count: "comment_id" })
     .modify(query => {
       if (author) query.where("articles.author", author);
       if (topic) query.where("articles_topic", topic);
@@ -116,8 +116,8 @@ const selectAllArticles = (
           return { ...restOfArticle, comment_count: +comment_count };
         }
       );
-      const checkUserExistPromise = checkUserExistance(author);
-      const checkTopicExistPromise = checkTopicExistance(topic);
+      const checkUserExistPromise = exports.checkUserExistance({ author });
+      const checkTopicExistPromise = exports.checkTopicExistance({ topic });
       return Promise.all([
         checkUserExistPromise,
         checkTopicExistPromise,
@@ -126,10 +126,11 @@ const selectAllArticles = (
     })
     .then(
       ([checkUserExistPromise, checkTopicExistPromise, formattedResult]) => {
+        console.log(formattedResult);
         if (checkUserExistPromise && checkTopicExistPromise)
           return formattedResult;
         else {
-          Promise.reject({
+          return Promise.reject({
             status: 404,
             msg: "Invalid Input - resource doesn't exist"
           });
@@ -138,7 +139,7 @@ const selectAllArticles = (
     );
 };
 
-const checkUserExistance = author => {
+exports.checkUserExistance = ({ author }) => {
   if (!author) return true;
   return connection("users")
     .where("username", author)
@@ -147,21 +148,11 @@ const checkUserExistance = author => {
     });
 };
 
-const checkTopicExistance = topic => {
+exports.checkTopicExistance = ({ topic }) => {
   if (!topic) return true;
   return connection("topics")
     .where("slug", topic)
     .then(topicExists => {
       topicExists.length === 0 ? "false" : "true";
     });
-};
-
-module.exports = {
-  selectArticleById,
-  changeVotes,
-  postComments,
-  selectCommentByArticleId,
-  selectAllArticles,
-  checkUserExistance,
-  checkTopicExistance
 };
