@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-exports.selectArticleById = article_id => {
+const selectArticleById = article_id => {
   return connection
     .select("articles.*")
     .from("articles")
@@ -26,7 +26,7 @@ exports.selectArticleById = article_id => {
     });
 };
 
-exports.changeVotes = (article_id, body) => {
+const changeVotes = (article_id, body) => {
   if (body["inc_votes"] === undefined) {
     return Promise.reject({
       status: 400,
@@ -43,7 +43,7 @@ exports.changeVotes = (article_id, body) => {
   }
 };
 
-exports.postComments = newComment => {
+const postComments = newComment => {
   if (!newComment.author || !newComment.body || !newComment.article_id) {
     return Promise.reject({
       status: 400,
@@ -58,11 +58,17 @@ exports.postComments = newComment => {
     });
 };
 
-exports.selectCommentByArticleId = (article_id, sort_by, order) => {
+const selectCommentByArticleId = (article_id, sort_by, order) => {
   // default values set for order and sort_by queries
   if (order !== "asc" || order !== "desc") order = "desc";
-  const columns = ["comment_id", "votes", "created_at", "author", "body"];
-  if (!sort_by.includes(columns)) sort_by = "created_at";
+  if (
+    (sort_by !== "comment_id",
+    sort_by !== "votes",
+    sort_by !== "created_at",
+    sort_by !== "author",
+    sort_by !== "body")
+  )
+    sort_by = "created_at";
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
@@ -78,24 +84,24 @@ exports.selectCommentByArticleId = (article_id, sort_by, order) => {
     });
 };
 
-exports.selectAllArticles = (
+const selectAllArticles = (
   sort_by = "created_at",
   order = "desc",
   author,
   topic
 ) => {
   if (order !== "asc" && order !== "desc") order = "desc";
-  const columns = [
-    "article_id",
-    "title",
-    "body",
-    "votes",
-    "topic",
-    "author",
-    "created_at",
-    "comment_count"
-  ];
-  if (!sort_by.includes(columns)) sort_by = " created_at";
+  if (
+    (sort_by !== "article_id",
+    sort_by !== "title",
+    sort_by !== "body",
+    sort_by !== "votes",
+    sort_by !== "topic",
+    sort_by !== "author",
+    sort_by !== "created_at",
+    sort_by !== "comment_count")
+  )
+    sort_by = " created_at";
   return connection
     .select("articles.*")
     .from("articles")
@@ -105,7 +111,7 @@ exports.selectAllArticles = (
     .count({ comment_count: "comment_id" })
     .modify(query => {
       if (author) query.where("articles.author", author);
-      if (topic) query.where("articles_topic", topic);
+      if (topic) query.where("articles.topic", topic);
     })
     .then(articles => {
       const formattedResult = articles.map(
@@ -115,43 +121,55 @@ exports.selectAllArticles = (
         }
       );
 
-      const checkUserExistPromise = exports.checkUserExistance({ author });
-      console.log(checkUserExistPromise);
-      // const checkTopicExistPromise = exports.checkTopicExistance({ topic });
+      const checkUserExistPromise = checkUserExistance(author);
+      const checkTopicExistPromise = checkTopicExistance(topic);
+
       return Promise.all([
         checkUserExistPromise,
-        // checkTopicExistPromise,
+        checkTopicExistPromise,
         formattedResult
       ]);
     })
-    .then(([checkUserExistPromise, formattedResult]) => {
-      console.log(checkUserExistPromise);
-      if (checkUserExistPromise) {
-        return formattedResult;
-      } else {
-        return Promise.reject({
-          status: 404,
-          msg: "Invalid Input - resource doesn't exist"
-        });
+    .then(
+      ([checkUserExistPromise, checkTopicExistPromise, formattedResult]) => {
+        if (checkUserExistPromise && checkTopicExistPromise) {
+          return formattedResult;
+        } else {
+          return Promise.reject({
+            status: 404,
+            msg: "Invalid Input - resource doesn't exist"
+          });
+        }
       }
-    });
+    );
 };
 
-exports.checkUserExistance = ({ author }) => {
+const checkUserExistance = author => {
   if (!author) return true;
   return connection("users")
     .where("username", author)
     .then(userExists => {
-      console.log(userExists);
-      userExists.length === 0 ? "false" : "true";
+      if (userExists.length === 0) return false;
+      return true;
     });
 };
 
-exports.checkTopicExistance = ({ topic }) => {
+const checkTopicExistance = topic => {
   if (!topic) return true;
   return connection("topics")
     .where("slug", topic)
     .then(topicExists => {
-      topicExists.length === 0 ? "false" : "true";
+      if (topicExists.length === 0) return false;
+      return true;
     });
+};
+
+module.exports = {
+  checkTopicExistance,
+  checkUserExistance,
+  selectAllArticles,
+  selectArticleById,
+  selectCommentByArticleId,
+  changeVotes,
+  postComments
 };

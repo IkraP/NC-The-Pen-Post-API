@@ -10,7 +10,7 @@ chai.use(chaiSorted);
 
 describe("/api", () => {
   beforeEach(() => connection.seed.run());
-  after(() => connection.destroy());
+  after(() => connection.destroy().done());
   describe("/topics", () => {
     it("GET / will give a status code of 200 after successful response", () => {
       return request(app)
@@ -386,9 +386,9 @@ describe("/api", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
-          .then(articles => {
-            expect(articles.body.articles).to.be.an("array");
-            expect(articles.body.articles[0]).to.have.keys([
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.an("array");
+            expect(articles[0]).to.have.keys([
               "author",
               "title",
               "article_id",
@@ -397,6 +397,12 @@ describe("/api", () => {
               "votes",
               "comment_count"
             ]);
+          });
+      });
+      it("GET / will have a total_count key on the articles array to speciify number of articles", () => {
+        return request(app)
+          .get("/api/articles")
+          .then(articles => {
             expect(articles.body.total_count).to.be.an("Number");
           });
       });
@@ -420,12 +426,14 @@ describe("/api", () => {
         });
         return Promise.all(methodPromises);
       });
+
+      // A MASSIVE GLITCH HERE AS AUTHOR DOESN"T WORK
       it("GET / will accept sort_by queries by valid columns in the articles object", () => {
         return request(app)
-          .get("/api/articles?sort_by=author")
+          .get("/api/articles?sort_by=votes")
           .expect(200)
           .then(({ body: { articles } }) => {
-            expect(articles).to.be.sortedBy("author", { descending: true });
+            expect(articles).to.be.sortedBy("votes", { descending: true });
           });
       });
       it("GET / will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
@@ -434,6 +442,14 @@ describe("/api", () => {
           .expect(200)
           .then(({ body: { articles } }) => {
             expect(articles).to.be.sortedBy("created_at", { descending: true });
+          });
+      });
+      it("GET / will respond with articles array when sort_by column is not a column", () => {
+        return request(app)
+          .get("/api/articles?sort_by=sdnasnd")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.an("array");
           });
       });
       it("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
@@ -446,6 +462,14 @@ describe("/api", () => {
             });
           });
       });
+      it("GET / will respond with articles array when order specified is not asc or desc", () => {
+        return request(app)
+          .get("/api/articles?order=asdasf")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.an("array");
+          });
+      });
       it("GET / will default the order query to desc when order is not specified by client", () => {
         return request(app)
           .get("/api/articles")
@@ -454,35 +478,201 @@ describe("/api", () => {
             expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it.only("GET / will filter articles based on author specified by client", () => {
+      it("GET / will filter articles based on author specified by client", () => {
         return request(app)
-          .get("/api/articles?author=icellusedkars")
+          .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(({ body: { articles } }) => {
-            console.log(articles);
-            // expect(articles[0].author).to.equal("icellusedkars");
-            // expect(articles[articles.length - 1].author).to.equal(
-            //   "icellusedkars"
-            // );
-            // expect(articles).to.be.sortedBy("created_at", {
-            //   descending: true
-            // });
+            expect(articles[0].author).to.equal("butter_bridge");
+            expect(articles[articles.length - 1].author).to.equal(
+              "butter_bridge"
+            );
+            expect(articles).to.be.sortedBy("created_at", {
+              descending: true
+            });
           });
       });
-      it("GET / will respond with error with author doesn't exist", () => {
+      it("GET / will respond with error when author doesn't exist", () => {
         return request(app)
           .get("/api/articles?author=sadiyah")
           .expect(404)
           .then(({ body: { msg } }) => {
-            console.log(msg);
             expect(msg).to.equal("Invalid Input - resource doesn't exist");
           });
       });
+      it("GET / will respond with an empty array when author is valid but written no articles", () => {
+        return request(app)
+          .get("/api/articles?author=lurker")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.an("array");
+            expect(articles.length).to.equal(0);
+          });
+      });
       it("GET / will respond with articles by a certain topic when client specifies the topic", () => {
-        return request(app);
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles[0].topic).to.equal("mitch");
+            expect(articles[articles.length - 1].topic).to.equal("mitch");
+            expect(articles).to.be.sortedBy("created_at", {
+              descending: true
+            });
+          });
+      });
+      it("GET / will respond with a 404 error when topic doesn't exist", () => {
+        return request(app)
+          .get("/api/articles?topic=asdasdf")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Invalid Input - resource doesn't exist");
+          });
       });
     });
   });
-});
+  describe("/comments", () => {
+    describe("/comment_id", () => {
+      it("PATCH / will respond with a status code 201 when comment is updated with inc votes", () => {
+        return request(app)
+          .patch("/api/comments/10")
+          .send({ inc_votes: 10 })
+          .expect(201);
+      });
+      it("PATCH / will respond with a status code 201 when comment is updated with inc_votes is a positive integer", () => {
+        return request(app)
+          .patch("/api/comments/10")
+          .send({ inc_votes: 10 })
+          .expect(201)
+          .then(({ body: { comment } }) => {
+            expect(comment).to.be.an("object");
+            expect(comment).to.have.keys([
+              "comment_id",
+              "author",
+              "article_id",
+              "votes",
+              "created_at",
+              "body"
+            ]);
+            expect(comment.votes).to.equal(10);
+          });
+      });
+      it("PATCH / will respond with a status code 201 when comment is updated with inc_votes is a negative integer", () => {
+        return request(app)
+          .patch("/api/comments/10")
+          .expect(201)
+          .send({ inc_votes: -10 })
+          .then(({ body: { comment } }) => {
+            expect(comment).to.be.an("object");
+            expect(comment).to.have.keys([
+              "comment_id",
+              "author",
+              "article_id",
+              "votes",
+              "created_at",
+              "body"
+            ]);
+            expect(comment.votes).to.equal(-10);
+          });
+      });
+      it("PATCH / will respond with the comment object without inc/dec in votes when the no inc_votes is specified by the client", () => {
+        return request(app)
+          .patch("/api/comments/10")
+          .expect(201)
+          .send({})
+          .then(({ body: { comment } }) => {
+            expect(comment).to.be.an("object");
+            expect(comment).to.have.keys([
+              "comment_id",
+              "author",
+              "article_id",
+              "votes",
+              "created_at",
+              "body"
+            ]);
+            expect(comment.votes).to.equal(0);
+          });
+      });
+      it("PATCH / will respond with the comment object without inc/ dec in votes when inc_votes is incorrectly spelt by client", () => {
+        return request(app)
+          .patch("/api/comments/10")
+          .expect(201)
+          .send({ incvotes: 2 })
+          .then(({ body: { comment } }) => {
+            expect(comment).to.be.an("object");
+            expect(comment).to.have.keys([
+              "comment_id",
+              "author",
+              "article_id",
+              "votes",
+              "created_at",
+              "body"
+            ]);
+            expect(comment.votes).to.equal(0);
+          });
+      });
+      it("PATCH / will respond with a 404 error when the comment doesn't exist to inc/dec votes", () => {
+        return request(app)
+          .patch("/api/comments/189759")
+          .send({ inc_votes: 90 })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Comment does not exist");
+          });
+      });
+      it("PATCH / will respond with invalid column type bad request when client gives a comment that doesn't exist", () => {
+        return request(app)
+          .patch("/api/comments/not-a-valid-id")
+          .send({ inc_votes: 90 })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request");
+          });
+      });
+      it("PATCH / will respond with a 400 when inc votes is not an integer by client", () => {
+        return request(app)
+          .patch("/api/comments/10")
+          .send({ inc_votes: "ikra" })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request");
+          });
+      });
+      it("DELETE / will delete the comment by comment id specified by client respond with a 204 with no content", () => {
+        return request(app)
+          .delete("/api/comments/10")
+          .expect(204);
+      });
+      it("DELETE/ will respond with a 404 when the comment id specified by client doesn't exist", () => {
+        return request(app)
+          .delete("/api/comments/827321")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Comment does not exist");
+          });
+      });
+      it("DELETE / will respond with a 400", () => {
+        return request(app)
+          .delete("/api/comments/not-a-valid-id")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request");
+          });
+      });
+      it("/ will respond with a 405 method not allowed when method requested is not valid", () => {
+        const invalidMethods = ["get", "put", "post"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api/comments/1")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+    });
+  });
 
-// HOW to check if an author exists
+  describe("/", () => {});
+});

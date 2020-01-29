@@ -1,25 +1,39 @@
 const connection = require("../db/connection");
 
-exports.patchCommentbyId = (comment_id, inc_votes) => {
-  // newVote - how much the votes will need updating
+const patchCommentbyId = (comment_id, inc_votes) => {
   return connection
     .select("*")
     .from("comments")
     .where("comment_id", comment_id)
-    .increment("votes", inc_votes)
+    .increment("votes", inc_votes || 0)
     .returning("*")
     .then(comment => {
-      console.log(comment);
+      if (comment.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Comment does not exist"
+        });
+      }
+      return comment[0];
     });
-
-  // promise.reject if comment not found
-  //return an object
 };
 
-exports.deleteCommentById = comment_id => {
+const deleteCommentById = comment_id => {
   return connection("comments")
     .where("comment_id", comment_id)
     .del()
-    .then // something here to specifiy if no comment that deleted as doesn't exist then something maybe
-    ();
+    .then(comment => {
+      if (comment === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Comment does not exist"
+        });
+      }
+      return comment;
+    });
+};
+
+module.exports = {
+  deleteCommentById,
+  patchCommentbyId
 };
