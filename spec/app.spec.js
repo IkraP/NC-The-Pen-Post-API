@@ -438,33 +438,38 @@ describe("/api", () => {
             expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      xit("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
+      it("GET / will sort the order of articles when the client specifies the order as desc or asc", () => {
         return request(app)
-          .get("/api/articles?sort_by=comment_count&order=asc")
+          .get("/api/articles?order=asc")
           .expect(200)
-          .then(({ body: articles }) => {
-            expect(articles).to.be.sortedBy("comment_count");
+          .then(({ body: { articles } }) => {
+            console.log(articles);
+            expect(articles).to.be.sortedBy("created_at", {
+              descending: false
+            });
           });
       });
-      it.only("GET / will default the order query to desc when order is not specified by client", () => {
+      it("GET / will default the order query to desc when order is not specified by client", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
           .then(({ body: { articles } }) => {
-            console.log(articles);
-            expect(articles).to.be.sortedBy({ descending: true });
+            expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
       it("GET / will filter articles based on author specified by client", () => {
         return request(app)
-          .get("/api/articles?author=??????????")
+          .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(({ body: { articles } }) => {
-            console.log(articles);
-            expect(articles).to.be.sortedBy("????");
+            expect(articles[0].author).to.equal("butter_bridge");
+            expect(articles[articles.length - 1].author).to.equal(
+              "butter_bridge"
+            );
+            expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it("GET / will respond with error with author doesn't exist", () => {
+      it.only("GET / will respond with error with author doesn't exist", () => {
         return request(app)
           .get("/api/articles?author=Sadiyah")
           .expect(404)

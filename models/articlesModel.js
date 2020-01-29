@@ -90,6 +90,8 @@ const selectAllArticles = (
   author,
   topic
 ) => {
+  if (order !== "asc" && order !== "desc") order = "desc";
+
   return connection
     .select("articles.*")
     .from("articles")
@@ -98,7 +100,7 @@ const selectAllArticles = (
     .groupBy("articles.article_id")
     .count("comment_id as comment_count")
     .modify(query => {
-      if (author) query.where("articles_author", author);
+      if (author) query.where("articles.author", author);
       if (topic) query.where({ topic });
     })
     .then(articles => {
