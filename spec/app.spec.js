@@ -424,10 +424,8 @@ describe("/api", () => {
         return request(app)
           .get("/api/articles?sort_by=author")
           .expect(200)
-          .then(articles => {
-            expect(({ body: { articles } }) => {
-              expect(articles).to.be.sortedBy("author", { descending: true });
-            });
+          .then(({ body: { articles } }) => {
+            expect(articles).to.be.sortedBy("author", { descending: true });
           });
       });
       it("GET / will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
@@ -456,21 +454,22 @@ describe("/api", () => {
             expect(articles).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it("GET / will filter articles based on author specified by client", () => {
+      it.only("GET / will filter articles based on author specified by client", () => {
         return request(app)
           .get("/api/articles?author=icellusedkars")
           .expect(200)
           .then(({ body: { articles } }) => {
-            expect(articles[0].author).to.equal("icellusedkars");
-            expect(articles[articles.length - 1].author).to.equal(
-              "icellusedkars"
-            );
-            expect(articles).to.be.sortedBy("created_at", {
-              descending: true
-            });
+            console.log(articles);
+            // expect(articles[0].author).to.equal("icellusedkars");
+            // expect(articles[articles.length - 1].author).to.equal(
+            //   "icellusedkars"
+            // );
+            // expect(articles).to.be.sortedBy("created_at", {
+            //   descending: true
+            // });
           });
       });
-      it.only("GET / will respond with error with author doesn't exist", () => {
+      it("GET / will respond with error with author doesn't exist", () => {
         return request(app)
           .get("/api/articles?author=sadiyah")
           .expect(404)

@@ -63,7 +63,6 @@ exports.selectCommentByArticleId = (article_id, sort_by, order) => {
   if (order !== "asc" || order !== "desc") order = "desc";
   const columns = ["comment_id", "votes", "created_at", "author", "body"];
   if (!sort_by.includes(columns)) sort_by = "created_at";
-  console.log(article_id, sort_by, order);
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
@@ -97,7 +96,6 @@ exports.selectAllArticles = (
     "comment_count"
   ];
   if (!sort_by.includes(columns)) sort_by = " created_at";
-
   return connection
     .select("articles.*")
     .from("articles")
@@ -116,27 +114,27 @@ exports.selectAllArticles = (
           return { ...restOfArticle, comment_count: +comment_count };
         }
       );
+
       const checkUserExistPromise = exports.checkUserExistance({ author });
-      const checkTopicExistPromise = exports.checkTopicExistance({ topic });
+      console.log(checkUserExistPromise);
+      // const checkTopicExistPromise = exports.checkTopicExistance({ topic });
       return Promise.all([
         checkUserExistPromise,
-        checkTopicExistPromise,
+        // checkTopicExistPromise,
         formattedResult
       ]);
     })
-    .then(
-      ([checkUserExistPromise, checkTopicExistPromise, formattedResult]) => {
-        console.log(formattedResult);
-        if (checkUserExistPromise && checkTopicExistPromise)
-          return formattedResult;
-        else {
-          return Promise.reject({
-            status: 404,
-            msg: "Invalid Input - resource doesn't exist"
-          });
-        }
+    .then(([checkUserExistPromise, formattedResult]) => {
+      console.log(checkUserExistPromise);
+      if (checkUserExistPromise) {
+        return formattedResult;
+      } else {
+        return Promise.reject({
+          status: 404,
+          msg: "Invalid Input - resource doesn't exist"
+        });
       }
-    );
+    });
 };
 
 exports.checkUserExistance = ({ author }) => {
@@ -144,6 +142,7 @@ exports.checkUserExistance = ({ author }) => {
   return connection("users")
     .where("username", author)
     .then(userExists => {
+      console.log(userExists);
       userExists.length === 0 ? "false" : "true";
     });
 };

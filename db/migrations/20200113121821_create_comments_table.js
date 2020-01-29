@@ -3,6 +3,7 @@ exports.up = function(knex) {
     commentTable.increments("comment_id").primary();
     commentTable
       .string("author")
+      .notNullable()
       .references("users.username")
       .onDelete("SET NULL");
     commentTable

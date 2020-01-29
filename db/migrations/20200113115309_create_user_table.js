@@ -6,13 +6,12 @@ exports.up = function(knex) {
       .string("username")
       .primary()
       .unique();
-    userTable.string("avatar_url").notNullable();
-    userTable.string("name");
+    userTable.string("avatar_url");
+    userTable.string("name").notNullable();
   });
 };
 
 exports.down = function(knex) {
   // dropping the user table
-
   return knex.schema.dropTable("users");
 };
