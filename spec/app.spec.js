@@ -443,7 +443,6 @@ describe("/api", () => {
           .get("/api/articles?order=asc")
           .expect(200)
           .then(({ body: { articles } }) => {
-            console.log(articles);
             expect(articles).to.be.sortedBy("created_at", {
               descending: false
             });
@@ -459,24 +458,28 @@ describe("/api", () => {
       });
       it("GET / will filter articles based on author specified by client", () => {
         return request(app)
-          .get("/api/articles?author=butter_bridge")
+          .get("/api/articles?author=icellusedkars")
           .expect(200)
           .then(({ body: { articles } }) => {
-            expect(articles[0].author).to.equal("butter_bridge");
+            expect(articles[0].author).to.equal("icellusedkars");
             expect(articles[articles.length - 1].author).to.equal(
-              "butter_bridge"
+              "icellusedkars"
             );
-            expect(articles).to.be.sortedBy("created_at", { descending: true });
+            expect(articles).to.be.sortedBy("created_at", {
+              descending: true
+            });
           });
       });
       it.only("GET / will respond with error with author doesn't exist", () => {
-        return request(app)
-          .get("/api/articles?author=Sadiyah")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            console.log(articles);
-            expect(msg).to.equal("Author doesn't exist");
-          });
+        return (
+          request(app)
+            .get("/api/articles?author=sadiyah")
+            // .expect(404)
+            .then(({ body: { msg } }) => {
+              console.log(msg);
+              expect(msg).to.equal("Invalid Input - resource doesn't exist");
+            })
+        );
       });
       it("GET / will respond with articles by a certain topic when client specifies the topic", () => {
         return request(app);

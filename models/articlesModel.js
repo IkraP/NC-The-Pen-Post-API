@@ -61,14 +61,9 @@ const postComments = newComment => {
 const selectCommentByArticleId = (article_id, sort_by, order) => {
   // default values set for order and sort_by queries
   if (order !== "asc" || order !== "desc") order = "desc";
-  if (
-    (sort_by !== "comment_id" ||
-      sort_by !== "votes" ||
-      sort_by !== "created_at" ||
-      sort_by !== "author",
-    sort_by !== "body")
-  )
-    sort_by = "created_at";
+  const columns = ["comment_id", "votes", "created_at", "author", "body"];
+  if (!sort_by.includes(columns)) sort_by = "created_at";
+  console.log(article_id, sort_by, order);
   return selectArticleById(article_id)
     .then(articleExist => {
       if (articleExist.length) {
@@ -91,6 +86,17 @@ const selectAllArticles = (
   topic
 ) => {
   if (order !== "asc" && order !== "desc") order = "desc";
+  const columns = [
+    "article_id",
+    "title",
+    "body",
+    "votes",
+    "topic",
+    "author",
+    "created_at",
+    "comment_count"
+  ];
+  if (!sort_by.includes(columns)) sort_by = " created_at";
 
   return connection
     .select("articles.*")
@@ -101,16 +107,52 @@ const selectAllArticles = (
     .count("comment_id as comment_count")
     .modify(query => {
       if (author) query.where("articles.author", author);
-      if (topic) query.where({ topic });
+      if (topic) query.where("articles_topic", topic);
     })
     .then(articles => {
-      const formattedCount = articles.map(
+      const formattedResult = articles.map(
         ({ comment_count, ...restOfArticle }) => {
           delete restOfArticle.body;
           return { ...restOfArticle, comment_count: +comment_count };
         }
       );
-      return formattedCount;
+      const checkUserExistPromise = checkUserExistance(author);
+      const checkTopicExistPromise = checkTopicExistance(topic);
+      return Promise.all([
+        checkUserExistPromise,
+        checkTopicExistPromise,
+        formattedResult
+      ]);
+    })
+    .then(
+      ([checkUserExistPromise, checkTopicExistPromise, formattedResult]) => {
+        if (checkUserExistPromise && checkTopicExistPromise)
+          return formattedResult;
+        else {
+          Promise.reject({
+            status: 404,
+            msg: "Invalid Input - resource doesn't exist"
+          });
+        }
+      }
+    );
+};
+
+const checkUserExistance = author => {
+  if (!author) return true;
+  return connection("users")
+    .where("username", author)
+    .then(userExists => {
+      userExists.length === 0 ? "false" : "true";
+    });
+};
+
+const checkTopicExistance = topic => {
+  if (!topic) return true;
+  return connection("topics")
+    .where("slug", topic)
+    .then(topicExists => {
+      topicExists.length === 0 ? "false" : "true";
     });
 };
 
@@ -119,5 +161,7 @@ module.exports = {
   changeVotes,
   postComments,
   selectCommentByArticleId,
-  selectAllArticles
+  selectAllArticles,
+  checkUserExistance,
+  checkTopicExistance
 };
