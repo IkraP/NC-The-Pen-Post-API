@@ -5,6 +5,7 @@ const connection = require("../db/connection");
 const chai = require("chai");
 const { expect } = chai;
 const chaiSorted = require("chai-sorted");
+const endpoints = require("../endpoints.json");
 
 chai.use(chaiSorted);
 
@@ -674,5 +675,14 @@ describe("/api", () => {
     });
   });
 
-  describe("/", () => {});
+  describe("/", () => {
+    it("GET / will respond with a JSON describing all of the available endpoints and possible queries by the client", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(response => {
+          expect(response.body).to.eql(endpoints);
+        });
+    });
+  });
 });
