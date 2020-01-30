@@ -22,7 +22,7 @@ const selectArticleById = article_id => {
           status: 404,
           msg: "Article doesn't exist"
         });
-      } else return article;
+      } else return article[0];
     });
 };
 
@@ -62,26 +62,25 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
   // default values set for order and sort_by queries
   if (order !== "asc" || order !== "desc") order = "desc";
   if (
-    (sort_by !== "comment_id",
-    sort_by !== "votes",
-    sort_by !== "created_at",
-    sort_by !== "author",
-    sort_by !== "body")
-  )
+    sort_by !== "comment_id" &&
+    sort_by !== "votes" &&
+    sort_by !== "created_at" &&
+    sort_by !== "author" &&
+    sort_by !== "body"
+  ) {
     sort_by = "created_at";
-  return selectArticleById(article_id)
-    .then(articleExist => {
-      if (articleExist.length) {
-        return connection("comments")
-          .select("comment_id", "votes", "created_at", "author", "body")
-          .where("article_id", article_id)
-          .returning("*")
-          .orderBy(sort_by, order);
-      }
-    })
-    .then(comments => {
-      return comments;
-    });
+  }
+  // make it not a make a request unless empty array
+  return selectArticleById(article_id).then(articleExist => {
+    console.log(articleExist);
+    if (articleExist) {
+      return connection("comments")
+        .select("comment_id", "votes", "created_at", "author", "body")
+        .where("article_id", article_id)
+        .returning("*")
+        .orderBy(sort_by, order);
+    }
+  });
 };
 
 const selectAllArticles = (
@@ -92,16 +91,18 @@ const selectAllArticles = (
 ) => {
   if (order !== "asc" && order !== "desc") order = "desc";
   if (
-    (sort_by !== "article_id",
-    sort_by !== "title",
-    sort_by !== "body",
-    sort_by !== "votes",
-    sort_by !== "topic",
-    sort_by !== "author",
-    sort_by !== "created_at",
-    sort_by !== "comment_count")
-  )
-    sort_by = " created_at";
+    sort_by !== "article_id" &&
+    sort_by !== "title" &&
+    sort_by !== "body" &&
+    sort_by !== "votes" &&
+    sort_by !== "topic" &&
+    sort_by !== "author" &&
+    sort_by !== "created_at" &&
+    sort_by !== "comment_count"
+  ) {
+    sort_by = "created_at";
+  }
+  console.log(sort_by, order);
   return connection
     .select("articles.*")
     .from("articles")

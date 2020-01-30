@@ -95,13 +95,14 @@ describe("/api", () => {
           .get("/api/articles/1")
           .expect(200);
       });
+
       it("GET / will respond with an article object with required keys", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
           .then(({ body: { article } }) => {
-            expect(article).to.be.an("array");
-            expect(article[0]).to.have.keys([
+            expect(article).to.be.an("object");
+            expect(article).to.have.keys([
               "author",
               "title",
               "article_id",
@@ -111,7 +112,7 @@ describe("/api", () => {
               "votes",
               "comment_count"
             ]);
-            expect(article[0].author).to.equal("butter_bridge");
+            expect(article.author).to.equal("butter_bridge");
           });
       });
       it("GET / will respond with a 404 when an article doesn't exist", () => {
@@ -233,20 +234,19 @@ describe("/api", () => {
       });
       //AS METHOD NOT ALLOWED
 
-      //ALSO IN PATCH???
-      // it.only("POST / will respond with a 404 Not found when the article_id is not specified", () => {
-      //   return request(app)
-      //     .patch("/api/articles/")
-      //     .send({
-      //       username: "rogersop",
-      //       body: "I really liked this article - well done :)"
-      //     })
-      //     .expect(404)
-      //     .then(({ body: { msg } }) => {
-      //       console.log(msg);
-      //       expect(msg).to.equal("Route not found");
-      //     });
-      // });
+      //ALSO IN PATCH???  change!!!
+      it("POST / will respond with a 404 Not found when the article_id is not specified", () => {
+        return request(app)
+          .patch("/api/articles/")
+          .send({
+            username: "rogersop",
+            body: "I really liked this article - well done :)"
+          })
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("method not allowed");
+          });
+      });
       it("POST / will respond with a 405 bad request when no article is specified in the url and therefore route not allowed", () => {
         return request(app)
           .post("/api/articles/comments")
@@ -339,7 +339,7 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it("GET / will respond with the articles ordered in descending order when no order is specified by the client", () => {
+      it("GET / will respond with the comments ordered in descending order when no order is specified by the client", () => {
         return request(app)
           .get("/api/articles/5/comments?sort_by=created_at")
           .expect(200)
@@ -347,11 +347,12 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("created_at", { descending: true });
           });
       });
-      it("GET / will respond with the articles ordering in ascending when order is specified by the client", () => {
+      it.only("GET / will respond with the comments ordering in ascending when order is specified by the client", () => {
         return request(app)
           .get("/api/articles/1/comments?sort_by=comment_id&order=asc")
           .expect(200)
           .then(({ body: { comments } }) => {
+            console.log(comments);
             expect(comments).to.be.sortedBy("comment_id", { ascending: true });
           });
       });
@@ -428,13 +429,12 @@ describe("/api", () => {
         return Promise.all(methodPromises);
       });
 
-      // A MASSIVE GLITCH HERE AS AUTHOR DOESN"T WORK
       it("GET / will accept sort_by queries by valid columns in the articles object", () => {
         return request(app)
-          .get("/api/articles?sort_by=votes")
+          .get("/api/articles?sort_by=author")
           .expect(200)
           .then(({ body: { articles } }) => {
-            expect(articles).to.be.sortedBy("votes", { descending: true });
+            expect(articles).to.be.sortedBy("author", { descending: true });
           });
       });
       it("GET / will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
@@ -538,13 +538,13 @@ describe("/api", () => {
         return request(app)
           .patch("/api/comments/10")
           .send({ inc_votes: 10 })
-          .expect(201);
+          .expect(200);
       });
       it("PATCH / will respond with a status code 201 when comment is updated with inc_votes is a positive integer", () => {
         return request(app)
           .patch("/api/comments/10")
           .send({ inc_votes: 10 })
-          .expect(201)
+          .expect(200)
           .then(({ body: { comment } }) => {
             expect(comment).to.be.an("object");
             expect(comment).to.have.keys([
@@ -561,7 +561,7 @@ describe("/api", () => {
       it("PATCH / will respond with a status code 201 when comment is updated with inc_votes is a negative integer", () => {
         return request(app)
           .patch("/api/comments/10")
-          .expect(201)
+          .expect(200)
           .send({ inc_votes: -10 })
           .then(({ body: { comment } }) => {
             expect(comment).to.be.an("object");
@@ -579,7 +579,7 @@ describe("/api", () => {
       it("PATCH / will respond with the comment object without inc/dec in votes when the no inc_votes is specified by the client", () => {
         return request(app)
           .patch("/api/comments/10")
-          .expect(201)
+          .expect(200)
           .send({})
           .then(({ body: { comment } }) => {
             expect(comment).to.be.an("object");
@@ -597,7 +597,7 @@ describe("/api", () => {
       it("PATCH / will respond with the comment object without inc/ dec in votes when inc_votes is incorrectly spelt by client", () => {
         return request(app)
           .patch("/api/comments/10")
-          .expect(201)
+          .expect(200)
           .send({ incvotes: 2 })
           .then(({ body: { comment } }) => {
             expect(comment).to.be.an("object");

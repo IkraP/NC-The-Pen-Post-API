@@ -44,7 +44,6 @@ const sendCommentByArticleId = (request, response, next) => {
 
 const sendAllArticles = (request, response, next) => {
   const { sort_by, order, author, topic } = request.query;
-
   selectAllArticles(sort_by, order, author, topic)
     .then(articles => {
       response.status(200).send({ articles, total_count: articles.length });
