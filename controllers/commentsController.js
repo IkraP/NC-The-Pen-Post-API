@@ -15,7 +15,7 @@ const removeCommentById = (request, response, next) => {
   const { comment_id } = request.params;
   deleteCommentById(comment_id)
     .then(() => {
-      response.status(204).send();
+      response.sendStatus(204);
     })
     .catch(err => next(err));
 };

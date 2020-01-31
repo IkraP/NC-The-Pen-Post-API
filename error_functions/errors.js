@@ -14,16 +14,16 @@ const sendCustomError = (err, request, response, next) => {
 
 const sendPSQLError = (err, request, response, next) => {
   const psqlCodes = {
-    "22P02": "Bad request",
-    "42703": "Column doesn't exist",
-    "23503": "Not Found"
+    "22P02": { msg: "Bad request", status: 400 },
+    "42703": { msg: "Column doesn't exist", status: 404 },
+    "23503": { msg: "Not Found", status: 404 }
   };
-  if (err.code === "23503") {
-    response.status(404).send({ msg: "Not Found" });
-  } else if (psqlCodes[err.code]) {
-    response.status(400).send({ msg: psqlCodes[err.code] });
-  }
-  next(err);
+
+  if (psqlCodes[err.code]) {
+    response
+      .status(psqlCodes[err.code].status)
+      .send({ msg: psqlCodes[err.code].msg });
+  } else next(err);
 };
 
 const send500Error = (err, request, response, next) => {

@@ -1,29 +1,41 @@
 const connection = require("../db/connection");
 
 const selectArticleById = article_id => {
-  return connection
-    .select("articles.*")
-    .from("articles")
-    .where("articles.article_id", article_id)
-    .leftJoin("comments", "articles.article_id", "comments.article_id")
-    .groupBy("articles.article_id")
-    .countDistinct({ comment_count: "comments.article_id" })
-    .then(articlesCount => {
-      const formattedCount = articlesCount.map(
-        ({ comment_count, ...restOfArticle }) => {
-          return { ...restOfArticle, comment_count: +comment_count };
-        }
-      );
-      return formattedCount;
-    })
-    .then(article => {
-      if (article.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "Article doesn't exist"
-        });
-      } else return article[0];
-    });
+  return (
+    connection
+      .select("articles.*")
+      .from("articles")
+      .where("articles.article_id", article_id)
+      .leftJoin("comments", "articles.article_id", "comments.article_id")
+      .groupBy("articles.article_id")
+
+      /* a | c
+
+
+      1 | 1
+      1 | 2
+      3 | 3
+      5 | 4
+
+    */
+      .countDistinct({ comment_count: "comments.article_id" }) //maybe count distinct? OR have a look at what it is are counting (column)
+      .then(articlesCount => {
+        const formattedCount = articlesCount.map(
+          ({ comment_count, ...restOfArticle }) => {
+            return { ...restOfArticle, comment_count: +comment_count };
+          }
+        );
+        return formattedCount;
+      })
+      .then(article => {
+        if (article.length === 0) {
+          return Promise.reject({
+            status: 404,
+            msg: "Article doesn't exist"
+          });
+        } else return article[0];
+      })
+  );
 };
 
 const changeVotes = (article_id, body) => {
@@ -60,6 +72,7 @@ const postComments = newComment => {
 
 const selectCommentByArticleId = (article_id, sort_by, order) => {
   if (order !== "asc" && order !== "desc") order = "desc";
+  // valid colums ->
   if (
     sort_by !== "comment_id" &&
     sort_by !== "votes" &&

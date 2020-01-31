@@ -16,7 +16,7 @@ const sendArticleById = (request, response, next) => {
 const updateVotes = (request, response, next) => {
   const { article_id } = request.params;
   changeVotes(article_id, request.body)
-    .then(article => response.status(202).send({ article }))
+    .then(article => response.status(200).send({ article }))
     .catch(err => next(err));
 };
 

@@ -11,8 +11,9 @@ chai.use(chaiSorted);
 
 describe("/api", () => {
   beforeEach(() => connection.seed.run());
-  after(() => connection.destroy().done());
+  after(() => connection.destroy());
   describe("/topics", () => {
+    // ----------------- /TOPICS --------------------
     it("GET / will respond with status 200 when client requests topics array", () => {
       return request(app)
         .get("/api/topics")
@@ -28,6 +29,7 @@ describe("/api", () => {
           expect(topics[0]).to.have.keys(["slug", "description"]);
         });
     });
+    // ----------------- /TOPICS Error handling --------------------
     it("GET / will respond with 404 Invalid request when the url is invalid", () => {
       return request(app)
         .get("/api/not-a-valid-url")
@@ -49,6 +51,7 @@ describe("/api", () => {
       return Promise.all(methodPromises);
     });
   });
+  // ----------------- /USERS --------------------
   describe("/users", () => {
     describe("/:username", () => {
       it("GET / with a status code 200 after successful response", () => {
@@ -66,6 +69,7 @@ describe("/api", () => {
             expect(user.name).to.equal("sam");
           });
       });
+      // ----------------- /USERS Error handling --------------------
       it("GET / will respond with status 404 with invalid username when invalid user is requested", () => {
         return request(app)
           .get("/api/users/sadiyahKal")
@@ -88,6 +92,7 @@ describe("/api", () => {
       });
     });
   });
+  // -----------------  /Articles/:Article_id  --------------------
   describe("/articles", () => {
     describe("/:article_id", () => {
       it("GET / will respond with a status code of 200 when client requests an article by article_id", () => {
@@ -95,7 +100,6 @@ describe("/api", () => {
           .get("/api/articles/1")
           .expect(200);
       });
-
       it("GET / will respond with status 200 with an article object with required keys", () => {
         return request(app)
           .get("/api/articles/1")
@@ -115,6 +119,7 @@ describe("/api", () => {
             expect(article.author).to.equal("butter_bridge");
           });
       });
+      // -----------------  /Articles/:Article_id Error handling --------------------
       it("GET / will respond with a 404 when an article doesn't exist", () => {
         return request(app)
           .get("/api/articles/999999")
@@ -135,12 +140,12 @@ describe("/api", () => {
         return request(app)
           .patch("/api/articles/2")
           .send({ inc_votes: 10 })
-          .expect(202);
+          .expect(200);
       });
-      it("PATCH / will respond with status 202 with the updated article with votes updated", () => {
+      it("PATCH / will respond with status 200 with the updated article with votes updated", () => {
         return request(app)
           .patch("/api/articles/2")
-          .expect(202)
+          .expect(200)
           .send({ inc_votes: 20 })
           .then(({ body: { article } }) => {
             expect(article).to.be.an("object");
@@ -166,11 +171,11 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request: Missing required field");
           });
       });
-      it("PATCH / will respond with status 202 with an updated votes value when other key value pairs are also in the body", () => {
+      it("PATCH / will respond with status 200 with an updated votes value when other key value pairs are also in the body", () => {
         return request(app)
           .patch("/api/articles/5")
           .send({ inc_votes: 7, name: "Ikra" })
-          .expect(202)
+          .expect(200)
           .then(({ body: { article } }) => {
             expect(article).to.be.an("object");
             expect(article.votes).to.equal(7);
@@ -189,6 +194,7 @@ describe("/api", () => {
         });
         return Promise.all(methodPromises);
       });
+      // -----------------  /Articles/:article_id/comments --------------------
       it("POST / will respond with status 201 to signal a successful post of comments has completed", () => {
         return request(app)
           .post("/api/articles/1/comments")
@@ -211,6 +217,7 @@ describe("/api", () => {
             expect(comment).to.contain.keys(["body", "author", "article_id"]);
           });
       });
+      // -----------------  /Articles/:article_id/comments --------------------
       it("POST / will respond with status 400 and returns no comment given when no body is given by the client specifying no comment", () => {
         return request(app)
           .post("/api/articles/1/comments")
@@ -337,7 +344,6 @@ describe("/api", () => {
           .get("/api/articles/1/comments?sort_by=comment_id&order=asc")
           .expect(200)
           .then(({ body: { comments } }) => {
-            console.log(comments);
             expect(comments).to.be.sortedBy("comment_id", { ascending: true });
           });
       });
