@@ -59,7 +59,6 @@ const postComments = newComment => {
 };
 
 const selectCommentByArticleId = (article_id, sort_by, order) => {
-  // default values set for order and sort_by queries
   if (order !== "asc" && order !== "desc") order = "desc";
   if (
     sort_by !== "comment_id" &&
@@ -101,7 +100,6 @@ const selectAllArticles = (
   ) {
     sort_by = "created_at";
   }
-  console.log(sort_by, order);
   return connection
     .select("articles.*")
     .from("articles")
