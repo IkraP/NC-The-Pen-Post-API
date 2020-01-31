@@ -56,7 +56,7 @@ describe("/api", () => {
   // ----------------- /USERS --------------------
   describe("/users", () => {
     describe("/:username", () => {
-      it("GET / with a status code 200 after successful response", () => {
+      it("GET / with a status 200 after successful response", () => {
         return request(app)
           .get("/api/users/icellusedkars")
           .expect(200);
