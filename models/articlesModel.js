@@ -60,7 +60,7 @@ const postComments = newComment => {
 
 const selectCommentByArticleId = (article_id, sort_by, order) => {
   // default values set for order and sort_by queries
-  if (order !== "asc" || order !== "desc") order = "desc";
+  if (order !== "asc" && order !== "desc") order = "desc";
   if (
     sort_by !== "comment_id" &&
     sort_by !== "votes" &&
@@ -70,9 +70,8 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
   ) {
     sort_by = "created_at";
   }
-  // make it not a make a request unless empty array
+
   return selectArticleById(article_id).then(articleExist => {
-    console.log(articleExist);
     if (articleExist) {
       return connection("comments")
         .select("comment_id", "votes", "created_at", "author", "body")
