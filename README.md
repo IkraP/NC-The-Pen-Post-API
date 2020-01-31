@@ -16,7 +16,7 @@ NC News is a project created for the back-end block of the Northcoders bootcamp 
 1. Clone this repository
 
 ```bash
-git clone https://github.com/timothydowd/BE-NC-News.git
+git clone https://github.com/IkraP/NC-news-api.git
 ```
 
 2. `cd` into the repository

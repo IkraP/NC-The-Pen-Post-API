@@ -29,6 +29,7 @@ describe("/api", () => {
           expect(topics[0]).to.have.keys(["slug", "description"]);
         });
     });
+
     // ----------------- /TOPICS Error handling --------------------
     it("GET / will respond with 404 Invalid request when the url is invalid", () => {
       return request(app)
@@ -51,6 +52,7 @@ describe("/api", () => {
       return Promise.all(methodPromises);
     });
   });
+
   // ----------------- /USERS --------------------
   describe("/users", () => {
     describe("/:username", () => {
@@ -92,7 +94,8 @@ describe("/api", () => {
       });
     });
   });
-  // -----------------  /Articles/:Article_id  --------------------
+
+  // ----------------- /ARTICLES/ARTICLE_ID  --------------------
   describe("/articles", () => {
     describe("/:article_id", () => {
       it("GET / will respond with a status code of 200 when client requests an article by article_id", () => {
@@ -119,23 +122,6 @@ describe("/api", () => {
             expect(article.author).to.equal("butter_bridge");
           });
       });
-      // -----------------  /Articles/:Article_id Error handling --------------------
-      it("GET / will respond with a 404 when an article doesn't exist", () => {
-        return request(app)
-          .get("/api/articles/999999")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Article doesn't exist");
-          });
-      });
-      it("GET / will respond with a 400 Bad request when no article_id is specified", () => {
-        return request(app)
-          .get("/api/articles/notanid")
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad request");
-          });
-      });
       it("PATCH / will respond with a 200 when article has been updated with votes", () => {
         return request(app)
           .patch("/api/articles/2")
@@ -151,6 +137,34 @@ describe("/api", () => {
             expect(article).to.be.an("object");
             expect(article.votes).to.equal(20);
             expect(article).to.contain.keys(["article_id", "body", "votes"]);
+          });
+      });
+      it("PATCH / will respond with status 200 with an updated votes value when other key value pairs are also in the body", () => {
+        return request(app)
+          .patch("/api/articles/5")
+          .send({ inc_votes: 7, name: "Ikra" })
+          .expect(200)
+          .then(({ body: { article } }) => {
+            expect(article).to.be.an("object");
+            expect(article.votes).to.equal(7);
+            expect(article).to.contain.keys(["article_id", "body", "votes"]);
+          });
+      });
+      // ----------------- /ARTICLES/ARTICLE_ID Error handling --------------------
+      it("GET / will respond with a 404 when an article doesn't exist", () => {
+        return request(app)
+          .get("/api/articles/999999")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Article doesn't exist");
+          });
+      });
+      it("GET / will respond with a 400 Bad request when no article_id is specified", () => {
+        return request(app)
+          .get("/api/articles/notanid")
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request");
           });
       });
       it("PATCH / will respond with status 400 when request body has characters that do not match the required value of inc_votes", () => {
@@ -171,17 +185,6 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request: Missing required field");
           });
       });
-      it("PATCH / will respond with status 200 with an updated votes value when other key value pairs are also in the body", () => {
-        return request(app)
-          .patch("/api/articles/5")
-          .send({ inc_votes: 7, name: "Ikra" })
-          .expect(200)
-          .then(({ body: { article } }) => {
-            expect(article).to.be.an("object");
-            expect(article.votes).to.equal(7);
-            expect(article).to.contain.keys(["article_id", "body", "votes"]);
-          });
-      });
       it("PATCH / will respond with a 405 method not allowed when method requested is not valid", () => {
         const invalidMethods = ["post", "put", "delete"];
         const methodPromises = invalidMethods.map(method => {
@@ -194,7 +197,7 @@ describe("/api", () => {
         });
         return Promise.all(methodPromises);
       });
-      // -----------------  /Articles/:article_id/comments --------------------
+      // ----------------- /ARTICLES/ARTICLES_ID/COMMENTS --------------------
       it("POST / will respond with status 201 to signal a successful post of comments has completed", () => {
         return request(app)
           .post("/api/articles/1/comments")
@@ -217,52 +220,7 @@ describe("/api", () => {
             expect(comment).to.contain.keys(["body", "author", "article_id"]);
           });
       });
-      // -----------------  /Articles/:article_id/comments --------------------
-      it("POST / will respond with status 400 and returns no comment given when no body is given by the client specifying no comment", () => {
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send({})
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad request: No comment given");
-          });
-      });
-      it("POST / will respond with status 400 when the body object given by client doesn't contain the correct keys", () => {
-        return request(app)
-          .post("/api/articles/1/comments")
-          .send({
-            myfriend: "rogersop",
-            body: "This article really speaks to me!"
-          })
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad request: No comment given");
-          });
-      });
-      it("POST / will respond with status 405 method not allowed when the article_id is not specified", () => {
-        return request(app)
-          .patch("/api/articles/")
-          .send({
-            username: "rogersop",
-            body: "I really liked this article - well done :)"
-          })
-          .expect(405)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("method not allowed");
-          });
-      });
-      it("POST / will respond with status 404 Not found when the article is a valid ID but doesn't exist in our database ", () => {
-        return request(app)
-          .post("/api/articles/456/comments")
-          .send({
-            username: "rogersop",
-            body: "I really like the way you write!"
-          })
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Not Found");
-          });
-      });
+
       it("GET / will respond with status 200 when array of comments is returned to client for a given article_id", () => {
         return request(app)
           .get("/api/articles/5/comments")
@@ -283,22 +241,7 @@ describe("/api", () => {
             ]);
           });
       });
-      it("GET / will respond with status 404 when article specified by client doesn't exist in the database", () => {
-        return request(app)
-          .get("/api/articles/789097/comments")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).equal("Article doesn't exist");
-          });
-      });
-      it("GET / will respond with status 400 bad request when no article_id is specified", () => {
-        return request(app)
-          .get("/api/articles/notanid/comments")
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).equal("Bad request");
-          });
-      });
+
       it("GET / will respond with status 200 and the sorted array default sorted by created_at", () => {
         return request(app)
           .get("/api/articles/5/comments")
@@ -355,62 +298,77 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("votes", { descending: true });
           });
       });
-    });
-    it("GET / will respond with status 405 method not allowed when method requested is not valid", () => {
-      const invalidMethods = ["patch", "put", "delete"];
-      const methodPromises = invalidMethods.map(method => {
+
+      // ----------------- /ARTICLES/ARTICLES_ID/COMMENTS Error Handling --------------------
+
+      it("POST / will respond with status 400 and returns no comment given when no body is given by the client specifying no comment", () => {
         return request(app)
-          [method]("/api/articles/1/comments")
+          .post("/api/articles/1/comments")
+          .send({})
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request: No comment given");
+          });
+      });
+      it("POST / will respond with status 400 when the body object given by client doesn't contain the correct keys", () => {
+        return request(app)
+          .post("/api/articles/1/comments")
+          .send({
+            myfriend: "rogersop",
+            body: "This article really speaks to me!"
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Bad request: No comment given");
+          });
+      });
+      it("POST / will respond with status 405 method not allowed when the article_id is not specified", () => {
+        return request(app)
+          .patch("/api/articles/")
+          .send({
+            username: "rogersop",
+            body: "I really liked this article - well done :)"
+          })
           .expect(405)
           .then(({ body: { msg } }) => {
             expect(msg).to.equal("method not allowed");
           });
       });
-      return Promise.all(methodPromises);
-    });
-    describe("/", () => {
-      it("GET / will respond with status 200 when the client requests all the articles", () => {
+      it("POST / will respond with status 404 Not found when the article is a valid ID but doesn't exist in our database ", () => {
         return request(app)
-          .get("/api/articles")
-          .expect(200);
-      });
-      it("GET / will respond with status 200 with an articles array of article objects with required keys", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.an("array");
-            expect(articles[0]).to.have.keys([
-              "author",
-              "title",
-              "article_id",
-              "topic",
-              "created_at",
-              "votes",
-              "comment_count"
-            ]);
+          .post("/api/articles/456/comments")
+          .send({
+            username: "rogersop",
+            body: "I really like the way you write!"
+          })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("Not Found");
           });
       });
-      it("GET / will have a total_count key on the articles array to specify number of articles", () => {
+
+      it("GET / will respond with status 404 when article specified by client doesn't exist in the database", () => {
         return request(app)
-          .get("/api/articles")
-          .then(articles => {
-            expect(articles.body.total_count).to.be.an("Number");
+          .get("/api/articles/789097/comments")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).equal("Article doesn't exist");
           });
       });
-      it("GET / will respond with status 404 Invalid request when the url is invalid", () => {
+      it("GET / will respond with status 400 bad request when no article_id is specified", () => {
         return request(app)
-          .get("/api/articles/not-a-valid-url")
+          .get("/api/articles/notanid/comments")
           .expect(400)
           .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Bad request");
+            expect(msg).equal("Bad request");
           });
       });
+
       it("GET / will respond with status 405 method not allowed when method requested is not valid", () => {
-        const invalidMethods = ["patch", "put", "delete", "post"];
+        const invalidMethods = ["patch", "put", "delete"];
         const methodPromises = invalidMethods.map(method => {
           return request(app)
-            [method]("/api/articles")
+            [method]("/api/articles/1/comments")
             .expect(405)
             .then(({ body: { msg } }) => {
               expect(msg).to.equal("method not allowed");
@@ -418,110 +376,170 @@ describe("/api", () => {
         });
         return Promise.all(methodPromises);
       });
-
-      it("GET / will respond with status 200 and accept sort_by queries by valid columns in the articles object", () => {
-        return request(app)
-          .get("/api/articles?sort_by=author")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.sortedBy("author", { descending: true });
-          });
-      });
-      it("GET / will respond with status 200 and will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.sortedBy("created_at", { descending: true });
-          });
-      });
-      it("GET / will respond with status 200 with the articles array when sort_by column is not a column", () => {
-        return request(app)
-          .get("/api/articles?sort_by=sdnasnd")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.an("array");
-          });
-      });
-      it("GET / will respond with status 200 and sort the order of articles when the client specifies the order as desc or asc", () => {
-        return request(app)
-          .get("/api/articles?order=asc")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.sortedBy("created_at", {
-              descending: false
-            });
-          });
-      });
-      it("GET / will respond with status 200 and the articles array in default sorting values when order specified is not asc or desc", () => {
-        return request(app)
-          .get("/api/articles?order=asdasf")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.an("array");
-          });
-      });
-      it("GET / will respond with status 200 and default the order query to desc when order is not specified by client", () => {
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.sortedBy("created_at", { descending: true });
-          });
-      });
-      it("GET / will respond with status 200 and will filter articles based on author specified by client", () => {
-        return request(app)
-          .get("/api/articles?author=butter_bridge")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0].author).to.equal("butter_bridge");
-            expect(articles[articles.length - 1].author).to.equal(
-              "butter_bridge"
-            );
-            expect(articles).to.be.sortedBy("created_at", {
-              descending: true
-            });
-          });
-      });
-      it("GET / will respond with status 404 and Invalid Input when author doesn't exist", () => {
-        return request(app)
-          .get("/api/articles?author=sadiyah")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Invalid Input - resource doesn't exist");
-          });
-      });
-      it("GET / will respond with status 200 and an empty array when author is valid but written no articles", () => {
-        return request(app)
-          .get("/api/articles?author=lurker")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).to.be.an("array");
-            expect(articles.length).to.equal(0);
-          });
-      });
-      it("GET / will respond with status 200 and articles by a certain topic when client specifies the topic", () => {
-        return request(app)
-          .get("/api/articles?topic=mitch")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0].topic).to.equal("mitch");
-            expect(articles[articles.length - 1].topic).to.equal("mitch");
-            expect(articles).to.be.sortedBy("created_at", {
-              descending: true
-            });
-          });
-      });
-      it("GET / will respond with status 404 error when topic doesn't exist", () => {
-        return request(app)
-          .get("/api/articles?topic=asdasdf")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).to.equal("Invalid Input - resource doesn't exist");
-          });
-      });
     });
   });
+
+  // ----------------- /ARTICLES  --------------------
+
+  describe("/", () => {
+    it("GET / will respond with status 200 when the client requests all the articles", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200);
+    });
+    it("GET / will respond with status 200 with an articles array of article objects with required keys", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.an("array");
+          expect(articles[0]).to.have.keys([
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "created_at",
+            "votes",
+            "comment_count"
+          ]);
+        });
+    });
+    it("GET / will have a total_count key on the articles array to specify number of articles", () => {
+      return request(app)
+        .get("/api/articles")
+        .then(articles => {
+          expect(articles.body.total_count).to.be.an("Number");
+        });
+    });
+
+    it("GET / will respond with status 200 and accept sort_by queries by valid columns in the articles object", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("author", { descending: true });
+        });
+    });
+    it("GET / will respond with status 200 and will sort the articles based on date (created_at) when no sort_by parameter is specified by client", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("created_at", { descending: true });
+        });
+    });
+    it("GET / will respond with status 200 with the articles array when sort_by column is not a column", () => {
+      return request(app)
+        .get("/api/articles?sort_by=sdnasnd")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.an("array");
+        });
+    });
+    it("GET / will respond with status 200 and sort the order of articles when the client specifies the order as desc or asc", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("created_at", {
+            descending: false
+          });
+        });
+    });
+    it("GET / will respond with status 200 and the articles array in default sorting values when order specified is not asc or desc", () => {
+      return request(app)
+        .get("/api/articles?order=asdasf")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.an("array");
+        });
+    });
+    it("GET / will respond with status 200 and default the order query to desc when order is not specified by client", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("created_at", { descending: true });
+        });
+    });
+    it("GET / will respond with status 200 and will filter articles based on author specified by client", () => {
+      return request(app)
+        .get("/api/articles?author=butter_bridge")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0].author).to.equal("butter_bridge");
+          expect(articles[articles.length - 1].author).to.equal(
+            "butter_bridge"
+          );
+          expect(articles).to.be.sortedBy("created_at", {
+            descending: true
+          });
+        });
+    });
+
+    it("GET / will respond with status 200 and an empty array when author is valid but written no articles", () => {
+      return request(app)
+        .get("/api/articles?author=lurker")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.an("array");
+          expect(articles.length).to.equal(0);
+        });
+    });
+    it("GET / will respond with status 200 and articles by a certain topic when client specifies the topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0].topic).to.equal("mitch");
+          expect(articles[articles.length - 1].topic).to.equal("mitch");
+          expect(articles).to.be.sortedBy("created_at", {
+            descending: true
+          });
+        });
+    });
+    // ----------------- /ARTICLES Error handling --------------------
+
+    it("GET / will respond with status 404 Invalid request when the url is invalid", () => {
+      return request(app)
+        .get("/api/articles/not-a-valid-url")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("Bad request");
+        });
+    });
+    it("GET / will respond with status 405 method not allowed when method requested is not valid", () => {
+      const invalidMethods = ["patch", "put", "delete", "post"];
+      const methodPromises = invalidMethods.map(method => {
+        return request(app)
+          [method]("/api/articles")
+          .expect(405)
+          .then(({ body: { msg } }) => {
+            expect(msg).to.equal("method not allowed");
+          });
+      });
+      return Promise.all(methodPromises);
+    });
+    it("GET / will respond with status 404 and Invalid Input when author doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?author=sadiyah")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("Invalid Input - resource doesn't exist");
+        });
+    });
+
+    it("GET / will respond with status 404 error when topic doesn't exist", () => {
+      return request(app)
+        .get("/api/articles?topic=asdasdf")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("Invalid Input - resource doesn't exist");
+        });
+    });
+  });
+  // ----------------- /COMMENTS  --------------------
+
   describe("/comments", () => {
     describe("/comment_id", () => {
       it("PATCH / will respond with a status 200 when comment is updated with inc votes", () => {
@@ -548,7 +566,7 @@ describe("/api", () => {
             expect(comment.votes).to.equal(10);
           });
       });
-      it("PATCH / will respond with a status 201 when comment is updated with inc_votes is a negative integer", () => {
+      it("PATCH / will respond with a status 200 when comment is updated with inc_votes is a negative integer", () => {
         return request(app)
           .patch("/api/comments/10")
           .expect(200)
@@ -602,6 +620,14 @@ describe("/api", () => {
             expect(comment.votes).to.equal(0);
           });
       });
+
+      it("DELETE / will respond with status 204 and no content and delete the comment by comment id specified by client", () => {
+        return request(app)
+          .delete("/api/comments/10")
+          .expect(204);
+      });
+      // ----------------- /COMMENTS Error handling --------------------
+
       it("PATCH / will respond with status 404 error when the comment doesn't exist to +/- votes", () => {
         return request(app)
           .patch("/api/comments/189759")
@@ -629,11 +655,7 @@ describe("/api", () => {
             expect(msg).to.equal("Bad request");
           });
       });
-      it("DELETE / will respond with status 204 and no content and delete the comment by comment id specified by client", () => {
-        return request(app)
-          .delete("/api/comments/10")
-          .expect(204);
-      });
+
       it("DELETE/ will respond with status 404 when the comment id specified by client doesn't exist", () => {
         return request(app)
           .delete("/api/comments/827321")
@@ -664,6 +686,7 @@ describe("/api", () => {
       });
     });
   });
+  // ----------------- /API --------------------
 
   describe("/", () => {
     it("GET / will respond with a JSON describing all of the available endpoints and possible queries by the client", () => {
