@@ -1,41 +1,29 @@
 const connection = require("../db/connection");
 
 const selectArticleById = article_id => {
-  return (
-    connection
-      .select("articles.*")
-      .from("articles")
-      .where("articles.article_id", article_id)
-      .leftJoin("comments", "articles.article_id", "comments.article_id")
-      .groupBy("articles.article_id")
-
-      /* a | c
-
-
-      1 | 1
-      1 | 2
-      3 | 3
-      5 | 4
-
-    */
-      .countDistinct({ comment_count: "comments.article_id" }) //maybe count distinct? OR have a look at what it is are counting (column)
-      .then(articlesCount => {
-        const formattedCount = articlesCount.map(
-          ({ comment_count, ...restOfArticle }) => {
-            return { ...restOfArticle, comment_count: +comment_count };
-          }
-        );
-        return formattedCount;
-      })
-      .then(article => {
-        if (article.length === 0) {
-          return Promise.reject({
-            status: 404,
-            msg: "Article doesn't exist"
-          });
-        } else return article[0];
-      })
-  );
+  return connection
+    .select("articles.*")
+    .from("articles")
+    .where("articles.article_id", article_id)
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .count({ comment_count: "comments.article_id" })
+    .then(articlesCount => {
+      const formattedCount = articlesCount.map(
+        ({ comment_count, ...restOfArticle }) => {
+          return { ...restOfArticle, comment_count: +comment_count };
+        }
+      );
+      return formattedCount;
+    })
+    .then(article => {
+      if (article.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Article doesn't exist"
+        });
+      } else return article[0];
+    });
 };
 
 const changeVotes = (article_id, body) => {
@@ -72,17 +60,9 @@ const postComments = newComment => {
 
 const selectCommentByArticleId = (article_id, sort_by, order) => {
   if (order !== "asc" && order !== "desc") order = "desc";
-  // valid colums ->
-  if (
-    sort_by !== "comment_id" &&
-    sort_by !== "votes" &&
-    sort_by !== "created_at" &&
-    sort_by !== "author" &&
-    sort_by !== "body"
-  ) {
-    sort_by = "created_at";
-  }
+  const validColumns = ["comment_id", "votes", "created_at", "author", "body"];
 
+  if (!validColumns.includes(sort_by)) sort_by = "created_at";
   return selectArticleById(article_id).then(articleExist => {
     if (articleExist) {
       return connection("comments")
@@ -101,18 +81,20 @@ const selectAllArticles = (
   topic
 ) => {
   if (order !== "asc" && order !== "desc") order = "desc";
-  if (
-    sort_by !== "article_id" &&
-    sort_by !== "title" &&
-    sort_by !== "body" &&
-    sort_by !== "votes" &&
-    sort_by !== "topic" &&
-    sort_by !== "author" &&
-    sort_by !== "created_at" &&
-    sort_by !== "comment_count"
-  ) {
-    sort_by = "created_at";
-  }
+
+  const validColumns = [
+    "article_id",
+    "title",
+    "body",
+    "votes",
+    "topic",
+    "author",
+    "created_at",
+    "comment_count"
+  ];
+
+  if (!validColumns.includes(sort_by)) sort_by = "created_at";
+
   return connection
     .select("articles.*")
     .from("articles")
@@ -145,11 +127,6 @@ const selectAllArticles = (
       ([checkUserExistPromise, checkTopicExistPromise, formattedResult]) => {
         if (checkUserExistPromise && checkTopicExistPromise) {
           return formattedResult;
-        } else {
-          return Promise.reject({
-            status: 404,
-            msg: "Invalid Input - resource doesn't exist"
-          });
         }
       }
     );
@@ -160,7 +137,11 @@ const checkUserExistance = author => {
   return connection("users")
     .where("username", author)
     .then(userExists => {
-      if (userExists.length === 0) return false;
+      if (userExists.length === 0)
+        return Promise.reject({
+          status: 404,
+          msg: "Invalid Input - resource doesn't exist"
+        });
       return true;
     });
 };
@@ -170,7 +151,11 @@ const checkTopicExistance = topic => {
   return connection("topics")
     .where("slug", topic)
     .then(topicExists => {
-      if (topicExists.length === 0) return false;
+      if (topicExists.length === 0)
+        return Promise.reject({
+          status: 404,
+          msg: "Invalid Input - resource doesn't exist"
+        });
       return true;
     });
 };
