@@ -58,7 +58,13 @@ const postComments = newComment => {
     });
 };
 
-const selectCommentByArticleId = (article_id, sort_by, order) => {
+const selectCommentByArticleId = (
+  article_id,
+  sort_by,
+  order,
+  limit = 10,
+  page = 1
+) => {
   if (order !== "asc" && order !== "desc") order = "desc";
   const validColumns = ["comment_id", "votes", "created_at", "author", "body"];
 
@@ -69,7 +75,9 @@ const selectCommentByArticleId = (article_id, sort_by, order) => {
         .select("comment_id", "votes", "created_at", "author", "body")
         .where("article_id", article_id)
         .returning("*")
-        .orderBy(sort_by, order);
+        .orderBy(sort_by, order)
+        .limit(limit)
+        .offset(page * limit - limit);
     }
   });
 };
@@ -78,7 +86,9 @@ const selectAllArticles = (
   sort_by = "created_at",
   order = "desc",
   author,
-  topic
+  topic,
+  limit = 10,
+  page = 1
 ) => {
   if (order !== "asc" && order !== "desc") order = "desc";
 
@@ -102,6 +112,8 @@ const selectAllArticles = (
     .orderBy(sort_by, order)
     .groupBy("articles.article_id")
     .count({ comment_count: "comment_id" })
+    .limit(limit)
+    .offset(page * limit - limit)
     .modify(query => {
       if (author) query.where("articles.author", author);
       if (topic) query.where("articles.topic", topic);

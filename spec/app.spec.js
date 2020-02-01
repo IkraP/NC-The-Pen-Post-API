@@ -297,6 +297,32 @@ describe("/api", () => {
             expect(comments).to.be.sortedBy("votes", { descending: true });
           });
       });
+      it("GET / will respond with status 200 when limit is specified by client and therefore returning select number of comments by article id", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=5")
+          .expect(200)
+          .then(comments => {
+            expect(comments.body.comments.length).to.equal(5);
+          });
+      });
+      it("GET / will respond with status 200 when limit is specified by client and page therefore returning select number of comments and on a select page by article id", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=5&page=2")
+          .expect(200)
+          .then(comments => {
+            expect(comments.body.comments.length).to.equal(5);
+            expect(comments.body.comments[0].author).to.equal("icellusedkars");
+          });
+      });
+      it("GET / will respond with status 200 when no limit and no page is specified by client therefore defaulting to 10 limit and page 1", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(comments => {
+            expect(comments.body.comments.length).to.equal(10);
+            expect(comments.body.comments[0].author).to.equal("butter_bridge");
+          });
+      });
 
       // ----------------- /ARTICLES/ARTICLES_ID/COMMENTS Error Handling --------------------
 
@@ -405,11 +431,11 @@ describe("/api", () => {
       it("GET / will have a total_count key on the articles array to specify number of articles", () => {
         return request(app)
           .get("/api/articles")
+          .expect(200)
           .then(articles => {
             expect(articles.body.total_count).to.be.an("Number");
           });
       });
-
       it("GET / will respond with status 200 and accept sort_by queries by valid columns in the articles object", () => {
         return request(app)
           .get("/api/articles?sort_by=author")
@@ -496,6 +522,36 @@ describe("/api", () => {
             });
           });
       });
+      it("GET / will respond with status 200 when limit is specified by client and therefore returning select number of articles", () => {
+        return request(app)
+          .get("/api/articles?limit=6")
+          .expect(200)
+          .then(articles => {
+            expect(articles.body.articles.length).to.equal(6);
+            expect(articles.body.total_count).to.equal(6);
+          });
+      });
+      it("GET / will respond with status 200 when limit is specified and page number is also specified by client therefore returning select number of articles and on a certain page", () => {
+        return request(app)
+          .get("/api/articles?limit=5&page=1")
+          .expect(200)
+          .then(articles => {
+            expect(articles.body.articles.length).to.equal(5);
+            expect(articles.body.total_count).to.equal(5);
+            expect(articles.body.articles[0].topic).to.equal("mitch");
+          });
+      });
+      it("GET / will respond with status 200 when no limit and no page is defined by client and defaults to 10 and defaults to page 1", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(articles => {
+            expect(articles.body.articles.length).to.equal(10);
+            expect(articles.body.total_count).to.equal(10);
+            expect(articles.body.articles[0].topic).to.equal("mitch");
+          });
+      });
+
       // ----------------- /ARTICLES Error handling --------------------
 
       it("GET / will respond with status 404 Invalid request when the url is invalid", () => {
@@ -537,6 +593,7 @@ describe("/api", () => {
       });
     });
   });
+
   // ----------------- /COMMENTS  --------------------
 
   describe("/comments", () => {
@@ -625,6 +682,7 @@ describe("/api", () => {
           .delete("/api/comments/10")
           .expect(204);
       });
+
       // ----------------- /COMMENTS Error handling --------------------
 
       it("PATCH / will respond with status 404 error when the comment doesn't exist to +/- votes", () => {

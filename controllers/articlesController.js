@@ -35,16 +35,17 @@ const sendComments = (request, response, next) => {
 
 const sendCommentByArticleId = (request, response, next) => {
   const { article_id } = request.params;
-  const { sort_by, order } = request.query;
+  const { sort_by, order, limit, page } = request.query;
 
-  selectCommentByArticleId(article_id, sort_by, order)
+  selectCommentByArticleId(article_id, sort_by, order, limit, page)
     .then(comments => response.status(200).send({ comments }))
     .catch(err => next(err));
 };
 
 const sendAllArticles = (request, response, next) => {
-  const { sort_by, order, author, topic } = request.query;
-  selectAllArticles(sort_by, order, author, topic)
+  const { sort_by, order, author, topic, page, limit } = request.query;
+
+  selectAllArticles(sort_by, order, author, topic, limit, page)
     .then(articles => {
       response.status(200).send({ articles, total_count: articles.length });
     })
