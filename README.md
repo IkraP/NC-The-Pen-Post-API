@@ -4,6 +4,8 @@ NC News is a project created for the back-end block of the Northcoders bootcamp 
 
 ## Getting started
 
+- LINK (https://ikra-news-api.herokuapp.com/)
+
 ### Prerequisites:
 
 - **Node** (download [here](https://nodejs.org/en/))
