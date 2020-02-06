@@ -45,24 +45,19 @@ const sendCommentByArticleId = (request, response, next) => {
 
 const sendAllArticles = (request, response, next) => {
   const { sort_by, order, author, topic, page, limit } = request.query;
-  // const allArticles = selectAllArticles(
-  //   sort_by,
-  //   order,
-  //   author,
-  //   topic,
-  //   limit,
-  //   page
-  // );
-  // const articlesLength = getArticlesLength();
-  // Promise.all([allArticles, articlesLength])
-  //   .then(([allArticles, articlesLength]) => {
-  //     response.status(200).send({ allArticles, total_count: articlesLength });
-  //   })
-  //   .catch(err => next(err));
+  const articles = selectAllArticles(
+    sort_by,
+    order,
+    author,
+    topic,
+    limit,
+    page
+  );
+  const total_count = getArticlesLength();
 
-  selectAllArticles(sort_by, order, author, topic, limit, page)
-    .then(articles => {
-      response.status(200).send({ articles, total_count: articles.length });
+  Promise.all([articles, total_count])
+    .then(([articles, total_count]) => {
+      response.status(200).send({ articles, total_count });
     })
     .catch(err => next(err));
 };

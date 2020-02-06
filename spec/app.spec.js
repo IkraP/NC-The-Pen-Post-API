@@ -417,7 +417,7 @@ describe("/api", () => {
           .expect(200)
           .then(({ body: { articles } }) => {
             expect(articles).to.be.an("array");
-            expect(articles[0]).to.have.keys([
+            expect(articles[0]).to.contain.keys([
               "author",
               "title",
               "article_id",
@@ -528,7 +528,7 @@ describe("/api", () => {
           .expect(200)
           .then(articles => {
             expect(articles.body.articles.length).to.equal(6);
-            expect(articles.body.total_count).to.equal(6);
+            expect(articles.body.total_count).to.equal(12);
           });
       });
       it("GET / will respond with status 200 when limit is specified and page number is also specified by client therefore returning select number of articles and on a certain page", () => {
@@ -537,7 +537,7 @@ describe("/api", () => {
           .expect(200)
           .then(articles => {
             expect(articles.body.articles.length).to.equal(5);
-            expect(articles.body.total_count).to.equal(5);
+            expect(articles.body.total_count).to.equal(12);
             expect(articles.body.articles[0].topic).to.equal("mitch");
           });
       });
@@ -547,7 +547,7 @@ describe("/api", () => {
           .expect(200)
           .then(articles => {
             expect(articles.body.articles.length).to.equal(10);
-            expect(articles.body.total_count).to.equal(10);
+            expect(articles.body.total_count).to.equal(12);
             expect(articles.body.articles[0].topic).to.equal("mitch");
           });
       });

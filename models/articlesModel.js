@@ -175,8 +175,8 @@ const checkTopicExistance = topic => {
 const getArticlesLength = () => {
   return connection("articles")
     .count("*")
-    .then(articles => {
-      return articles;
+    .then(([{ count: articleLength }]) => {
+      return parseInt(articleLength);
     });
 };
 
