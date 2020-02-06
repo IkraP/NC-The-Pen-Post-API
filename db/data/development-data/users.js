@@ -1,7 +1,7 @@
 module.exports = [
   {
     username: "tickle122",
-    name: "Tom Tickle",
+    name: "Tom Tickley",
     avatar_url: "https://i.ibb.co/n0L2KmS/5-3x.png"
   },
   {
