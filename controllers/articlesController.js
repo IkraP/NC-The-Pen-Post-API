@@ -3,7 +3,8 @@ const {
   changeVotes,
   postComments,
   selectCommentByArticleId,
-  selectAllArticles
+  selectAllArticles,
+  getArticlesLength
 } = require("../models/articlesModel");
 
 const sendArticleById = (request, response, next) => {
@@ -44,6 +45,20 @@ const sendCommentByArticleId = (request, response, next) => {
 
 const sendAllArticles = (request, response, next) => {
   const { sort_by, order, author, topic, page, limit } = request.query;
+  // const allArticles = selectAllArticles(
+  //   sort_by,
+  //   order,
+  //   author,
+  //   topic,
+  //   limit,
+  //   page
+  // );
+  // const articlesLength = getArticlesLength();
+  // Promise.all([allArticles, articlesLength])
+  //   .then(([allArticles, articlesLength]) => {
+  //     response.status(200).send({ allArticles, total_count: articlesLength });
+  //   })
+  //   .catch(err => next(err));
 
   selectAllArticles(sort_by, order, author, topic, limit, page)
     .then(articles => {

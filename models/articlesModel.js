@@ -172,6 +172,14 @@ const checkTopicExistance = topic => {
     });
 };
 
+const getArticlesLength = () => {
+  return connection("articles")
+    .count("*")
+    .then(articles => {
+      return articles;
+    });
+};
+
 module.exports = {
   checkTopicExistance,
   checkUserExistance,
@@ -179,5 +187,6 @@ module.exports = {
   selectArticleById,
   selectCommentByArticleId,
   changeVotes,
-  postComments
+  postComments,
+  getArticlesLength
 };
