@@ -2,9 +2,11 @@
 
 NC News is a project created for the back-end block of the Northcoders bootcamp and is a web application that is designed to host news articles. This relational database stores articles, comments, topics and users.
 
-## Getting started
+## Link to hosted server
 
-- LINK (https://ikra-news-api.herokuapp.com/)
+- API server: (https://ikra-news-api.herokuapp.com/)
+
+## Getting started
 
 ### Prerequisites:
 
