@@ -2,7 +2,7 @@ module.exports = [
   {
     username: "tickle122",
     name: "Tom Tickley",
-    avatar_url: "https://i.ibb.co/NsXGVmg/Asset-5-3x-100.jpg"
+    avatar_url: "https://i.ibb.co/CQ7Tmqb/Asset-7-3x-100.jpg"
   },
   {
     username: "grumpy19",
@@ -12,7 +12,7 @@ module.exports = [
   {
     username: "happyamy2016",
     name: "Amy Happy",
-    avatar_url: "https://i.ibb.co/NsXGVmg/Asset-5-3x-100.jpg"
+    avatar_url: "https://i.ibb.co/Zxg9gwQ/Asset-6-3x-100.jpg"
   },
   {
     username: "cooljmessy",
