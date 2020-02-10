@@ -2,32 +2,31 @@ module.exports = [
   {
     username: "tickle122",
     name: "Tom Tickley",
-    avatar_url: "https://i.ibb.co/n0L2KmS/5-3x.png"
+    avatar_url: "https://i.ibb.co/NsXGVmg/Asset-5-3x-100.jpg"
   },
   {
     username: "grumpy19",
     name: "Paul Grump",
-    avatar_url: "https://i.ibb.co/hf9tRSY/9-3x.png"
+    avatar_url: "https://i.ibb.co/NsXGVmg/Asset-5-3x-100.jpg"
   },
   {
     username: "happyamy2016",
     name: "Amy Happy",
-    avatar_url: "https://i.ibb.co/pnsvFtJ/8-3x.png"
+    avatar_url: "https://i.ibb.co/NsXGVmg/Asset-5-3x-100.jpg"
   },
   {
     username: "cooljmessy",
     name: "Peter Messy",
-    avatar_url: "https://i.ibb.co/D905hmH/6-3x.png"
+    avatar_url: "https://i.ibb.co/jJt8ZWx/Asset-3-3x-100.jpg"
   },
   {
     username: "weegembump",
     name: "Gemma Bump",
-    avatar_url: "https://i.ibb.co/3rY3QMc/boy-2-3x.png"
+    avatar_url: "https://i.ibb.co/FY74FdH/Asset-4-3x-100.jpg"
   },
   {
     username: "jessjelly",
     name: "Jess Jelly",
-    avatar_url:
-      "https://s-media-cache-ak0.pinimg.com/564x/39/62/ec/3962eca164e60cf46f979c1f57d4078b.jpg"
+    avatar_url: "https://i.ibb.co/brTYpN2/Asset-2-3x-100.jpg"
   }
 ];
