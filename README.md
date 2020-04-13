@@ -1,10 +1,18 @@
-# Northcoders - News RESTful API server Project
+# The Pen Post - API server
 
-NC News is a project created for the back-end block of the Northcoders bootcamp and is a web application that is designed to host news articles. This relational database stores articles, comments, topics and users.
+The Pen Post is a project created for the back-end block of the Northcoders bootcamp and is a web application that is designed to host news articles. This relational database stores articles, comments, topics and users.
 
-## Link to hosted server
+## Links to project:
 
-- API server: (https://ikra-news-api.herokuapp.com/)
+Back-end is hosted on Heroku
+
+- https://ikra-news-api.herokuapp.com
+
+Front-end was created using React.js and is hosted on Heroku
+
+- https://the-pen-post.herokuapp.com/home
+
+Github repo for front-end: https://github.com/IkraP/NC-The-Pen-Post
 
 ## Getting started
 
