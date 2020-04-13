@@ -1,6 +1,6 @@
 # The Pen Post - API server
 
-The Pen Post is a project created for the back-end block of the Northcoders bootcamp and is a web application that is designed to host news articles. This relational database stores articles, comments, topics and users.
+The Pen Post is a project created for the back-end block of the Northcoders bootcamp and is a web application that is designed to host news articles. This relational database stores articles, comments, topics and users. This project is a Node.js Express application using a RESTful API server to curate data from a postgreSQL database.
 
 ## Links to project:
 
@@ -43,7 +43,48 @@ cd NC-news-api
 npm install
 ```
 
-4. Database will require seeding please follow these steps
+4. Create a knexfile.js file in the root directory with the following code:
+
+```js
+const ENV = process.env.NODE_ENV || "development";
+const { DB_URL } = process.env;
+
+const baseConfig = {
+  client: "pg",
+  migrations: {
+    directory: "./db/migrations",
+  },
+  seeds: {
+    directory: "./db/seeds",
+  },
+};
+
+const customConfig = {
+  production: {
+    connection: `${DB_URL}?ssl=true`,
+  },
+  development: {
+    connection: {
+      database: "nc_news",
+      // if you are using a Linux, enter your username and password here
+      // username: 'yourUsername'
+      // password: 'yourPassword'
+    },
+  },
+  test: {
+    connection: {
+      database: "nc_news_test",
+      // if you are using a Linux, enter your username and password here
+      // username: 'yourUsername'
+      // password: 'yourPassword'
+    },
+  },
+};
+
+module.exports = { ...customConfig[ENV], ...baseConfig };
+```
+
+4. Database will require seeding - please follow these steps:
 
 ```bash
 npm run setup-dbs
@@ -73,7 +114,7 @@ GET /api
 
 ## Test Suite:
 
-**NC-news-api** has a suite of tests that have been used to check the functionality of endpoints of the server, error handling and any utility functions that were used to seed the data. The scripts are already present in this repository. Please follow the command below to run tests:
+**The-Pen-Post-API** has a suite of tests that have been used to check the functionality of endpoints of the server, error handling and any utility functions that were used to seed the data. The scripts are already present in this repository. Please follow the command below to run tests:
 
 ```bash
 npm test
