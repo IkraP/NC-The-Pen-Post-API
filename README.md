@@ -6,7 +6,7 @@ The Pen Post is a project created for the back-end block of the Northcoders boot
 
 Back-end is hosted on Heroku
 
-- https://ikra-news-api.herokuapp.com
+- https://ikra-news-api.herokuapp.com/api
 
 Front-end was created using React.js and is hosted on Heroku
 
